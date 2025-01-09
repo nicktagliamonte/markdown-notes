@@ -4,6 +4,7 @@ import SideMenu from "./components/SideMenu";
 import TabBar from "./components/TabBar";
 import Editor from "./components/Editor";
 import Preview from "./components/Preview";
+import BottomBar from "./components/BottomBar";
 
 const mockNotes = [
   {
@@ -106,6 +107,7 @@ function App() {
         editorHeight={height}
         sideMenuWidth={sideMenuWidth}
       />
+      <BottomBar />
     </div>
   );
 }

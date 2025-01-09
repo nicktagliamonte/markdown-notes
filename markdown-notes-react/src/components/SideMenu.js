@@ -19,7 +19,7 @@ const SideMenu = ({ notes, width, onMouseDown }) => {
 
   return (
     <div
-      style={{ display: "flex", height: "calc(100vh)" }}
+      style={{ display: "flex", height: "calc(100vh - 25px)" }}
     >
       <Drawer
         variant="permanent"
@@ -27,12 +27,12 @@ const SideMenu = ({ notes, width, onMouseDown }) => {
           width: `${width}px`,
           flexShrink: 0,
           top: "20px", // Start 20px from the top
-          height: "calc(100vh - 20px)", // Ensure it fills the remaining height
+          height: "calc(100vh - 45px)", // Ensure it fills the remaining height
           "& .MuiDrawer-paper": {
             width,
             boxSizing: "border-box",
             top: "20px", // Ensure the paper aligns with the drawer
-            height: "calc(100vh - 20px)",
+            height: "calc(100vh - 45px)",
           },
         }}
       >
