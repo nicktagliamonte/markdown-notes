@@ -116,6 +116,8 @@ const TopMenu = () => {
             <MenuItem onClick={handleFileMenuClose}>Open</MenuItem>
             <MenuItem onClick={handleFileMenuClose}>Save</MenuItem>
             <MenuItem onClick={handleFileMenuClose}>Save As</MenuItem>
+            <MenuItem onClick={handleFileMenuClose}>New Note</MenuItem>
+            <MenuItem onClick={handleFileMenuClose}>New Page</MenuItem>
           </Menu>
 
           {/* Edit Button and Menu */}

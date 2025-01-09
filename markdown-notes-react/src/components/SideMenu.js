@@ -8,7 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const SideMenu = ({ notes }) => {
+const SideMenu = ({ notes, onWidthChange }) => {
   const [width, setWidth] = useState(240); // Initial width of the drawer
   const [isResizing, setIsResizing] = useState(false);
   const [expandedNote, setExpandedNote] = useState(null);
@@ -19,11 +19,14 @@ const SideMenu = ({ notes }) => {
 
   const handleMouseMove = (e) => {
     if (!isResizing) return;
-    setWidth(Math.max(150, e.clientX)); // Minimum width is 150px
+    const newWidth = Math.max(150, e.clientX); // Minimum width is 150px
+    setWidth(newWidth); // Update local state
+    onWidthChange(newWidth); // Notify parent of width change in real-time
   };
 
   const handleMouseUp = () => {
     setIsResizing(false);
+    onWidthChange(width); // Ensure parent has the final width
   };
 
   const handleToggle = (noteId) => {
@@ -32,7 +35,7 @@ const SideMenu = ({ notes }) => {
 
   return (
     <div
-      style={{ display: "flex", height: "calc(100vh - 20px)" }}
+      style={{ display: "flex", height: "calc(100vh)" }}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
@@ -90,7 +93,7 @@ const SideMenu = ({ notes }) => {
       <div
         onMouseDown={handleMouseDown}
         style={{
-          width: "5px",
+          width: "4px",
           cursor: "ew-resize",
           backgroundColor: "#ddd",
         }}

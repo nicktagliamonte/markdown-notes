@@ -4,24 +4,18 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 const lightTheme = createTheme({
   palette: {
     mode: "light",
-    primary: {
-      main: "#D3D3D3",
-    },
-    background: {
-      default: "#D3D3D3",
-    },
+    primary: { main: "#D3D3D3" },
+    background: { default: "#ffffff" },
+    text: { primary: "#000000" }, // Add text colors
   },
 });
 
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
-    primary: {
-      main: "#2C2C2C",
-    },
-    background: {
-      default: "#2C2C2C",
-    },
+    primary: { main: "#2C2C2C" },
+    background: { default: "#121212" },
+    text: { primary: "#ffffff" }, // Add text colors
   },
 });
 
