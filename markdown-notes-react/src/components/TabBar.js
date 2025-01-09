@@ -44,7 +44,7 @@ const TabBar = ({ sideMenuWidth }) => {
         alignItems: "stretch",
         position: "fixed",
         top: "20px", // Below TopMenu
-        left: `${sideMenuWidth + 4}px`, // Dynamic left edge
+        left: `${sideMenuWidth + 5}px`, // Dynamic left edge
         right: "0", // Stretches to the right edge
         backgroundColor: "background.paper",
         borderBottom: "1px solid", // Add border

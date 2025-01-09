@@ -8,26 +8,8 @@ import IconButton from "@mui/material/IconButton";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const SideMenu = ({ notes, onWidthChange }) => {
-  const [width, setWidth] = useState(240); // Initial width of the drawer
-  const [isResizing, setIsResizing] = useState(false);
+const SideMenu = ({ notes, width, onMouseDown }) => {
   const [expandedNote, setExpandedNote] = useState(null);
-
-  const handleMouseDown = () => {
-    setIsResizing(true);
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isResizing) return;
-    const newWidth = Math.max(150, e.clientX); // Minimum width is 150px
-    setWidth(newWidth); // Update local state
-    onWidthChange(newWidth); // Notify parent of width change in real-time
-  };
-
-  const handleMouseUp = () => {
-    setIsResizing(false);
-    onWidthChange(width); // Ensure parent has the final width
-  };
 
   const handleToggle = (noteId) => {
     setExpandedNote((prev) => (prev === noteId ? null : noteId));
@@ -36,13 +18,11 @@ const SideMenu = ({ notes, onWidthChange }) => {
   return (
     <div
       style={{ display: "flex", height: "calc(100vh)" }}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
     >
       <Drawer
         variant="permanent"
         sx={{
-          width,
+          width: `${width}px`,
           flexShrink: 0,
           top: "20px", // Start 20px from the top
           height: "calc(100vh - 20px)", // Ensure it fills the remaining height
@@ -91,9 +71,9 @@ const SideMenu = ({ notes, onWidthChange }) => {
       </Drawer>
       {/* Resizable Handle */}
       <div
-        onMouseDown={handleMouseDown}
+        onMouseDown={onMouseDown}
         style={{
-          width: "4px",
+          width: "5px",
           cursor: "ew-resize",
           backgroundColor: "#ddd",
         }}
