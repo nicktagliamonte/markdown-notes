@@ -7,8 +7,10 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useTheme } from '@mui/material/styles';
 
 const SideMenu = ({ notes, width, onMouseDown }) => {
+  const theme = useTheme();
   const [expandedNote, setExpandedNote] = useState(null);
 
   const handleToggle = (noteId) => {
@@ -75,7 +77,7 @@ const SideMenu = ({ notes, width, onMouseDown }) => {
         style={{
           width: "5px",
           cursor: "ew-resize",
-          backgroundColor: "#ddd",
+          backgroundColor: theme.palette.divider,
         }}
       ></div>
     </div>

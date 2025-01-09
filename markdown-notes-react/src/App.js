@@ -3,6 +3,7 @@ import TopMenu from "./components/TopMenu";
 import SideMenu from "./components/SideMenu";
 import TabBar from "./components/TabBar";
 import Editor from "./components/Editor";
+import Preview from "./components/Preview";
 
 const mockNotes = [
   {
@@ -100,6 +101,10 @@ function App() {
         tabBarHeight={tabBarHeight}
         height={height}
         onMouseDown={handleMouseDownEditor}
+      />
+      <Preview 
+        editorHeight={height}
+        sideMenuWidth={sideMenuWidth}
       />
     </div>
   );

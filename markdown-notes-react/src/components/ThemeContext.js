@@ -7,6 +7,7 @@ const lightTheme = createTheme({
     primary: { main: "#D3D3D3" },
     background: { default: "#ffffff", paper: "#f5f5f5" },
     text: { primary: "#000000" }, // Add text colors
+    divider: "#D3D3D3",
   },
 });
 
@@ -16,6 +17,7 @@ const darkTheme = createTheme({
     primary: { main: "#2C2C2C" },
     background: { default: "#2c2c2c", paper: "#222223" },
     text: { primary: "#ffffff" }, // Add text colors
+    divider: "#363637"
   },
 });
 
