@@ -6,18 +6,18 @@ const mockNotes = [
   {
     id: 1,
     title: "Note 1",
-    tabs: [
-      { id: 1, title: "Tab 1" },
-      { id: 2, title: "Tab 2" },
+    pages: [  // Updated from 'tabs' to 'pages'
+      { id: 1, title: "Page 1" },
+      { id: 2, title: "Page 2" },
     ],
   },
   {
     id: 2,
     title: "Note 2",
-    tabs: [
-      { id: 3, title: "Tab 1" },
-      { id: 4, title: "Tab 2" },
-      { id: 5, title: "Tab 3" },
+    pages: [  // Updated from 'tabs' to 'pages'
+      { id: 3, title: "Page 1" },
+      { id: 4, title: "Page 2" },
+      { id: 5, title: "Page 3" },
     ],
   },
 ];

@@ -70,14 +70,14 @@ const SideMenu = ({ notes }) => {
                 unmountOnExit
               >
                 <List component="div" disablePadding>
-                  {note.tabs.map((tab) => (
+                  {note.pages.map((page) => (
                     <ListItem
-                      key={tab.id}
+                      key={page.id}
                       sx={{ pl: 4 }}
                       button
-                      onClick={() => console.log(`Open tab ${tab.title}`)}
+                      onClick={() => console.log(`Open page ${page.title}`)}
                     >
-                      <ListItemText primary={tab.title} />
+                      <ListItemText primary={page.title} />
                     </ListItem>
                   ))}
                 </List>
