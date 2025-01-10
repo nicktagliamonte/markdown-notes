@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from "react";
+import FindModal from "./components/FindModal";
+import ReplaceModal from "./components/ReplaceModal";
+import FindInNotesModal from "./components/FindInNotesModal";
+import ReplaceInNotesModal from "./components/ReplaceInNotesModal";
 import TopMenu from "./components/TopMenu";
 import SideMenu from "./components/SideMenu";
 import TabBar from "./components/TabBar";
@@ -41,7 +45,28 @@ function App() {
   const [startWidth, setStartWidth] = useState(240); // Initial SideMenu width
   const [sideMenuWidth, setSideMenuWidth] = useState(240);
 
+  // TabBar Height
   const [tabBarHeight] = useState(70); // Fixed TabBar height
+
+  // FindModal Handlers
+  const [isFindModalOpen, setFindModalOpen] = useState(false);
+  const handleOpenFind = () => setFindModalOpen(true);
+  const handleCloseFind = () => setFindModalOpen(false);
+
+  // ReplaceModal Handlers
+  const [isReplaceModalOpen, setReplaceModalOpen] = useState(false);
+  const handleOpenReplace = () => setReplaceModalOpen(true);
+  const handleCloseReplace = () => setReplaceModalOpen(false);
+
+  // FindInNotesModal Handlers
+  const [isFindInNotesModalOpen, setFindInNotesModalOpen] = useState(false);
+  const handleOpenFindInNotes = () => setFindInNotesModalOpen(true);
+  const handleCloseFindInNotes = () => setFindInNotesModalOpen(false);
+
+  // ReplaceInNotesModal Handlers
+  const [isReplacInNoteseModalOpen, setReplaceInNotesModalOpen] = useState(false);
+  const handleOpenReplaceInNotes = () => setReplaceInNotesModalOpen(true);
+  const handleCloseReplaceInNotes = () => setReplaceInNotesModalOpen(false);
 
   // Editor Height Resizing Logic
   useEffect(() => {
@@ -91,7 +116,11 @@ function App() {
 
   return (
     <div>
-      <TopMenu />
+      <TopMenu onOpenFind={handleOpenFind} onOpenReplace={handleOpenReplace} onOpenFindInNotes={handleOpenFindInNotes} onOpenReplaceInNotes={handleOpenReplaceInNotes} />
+      <FindModal isOpen={isFindModalOpen} onClose={handleCloseFind} />
+      <ReplaceModal isOpen={isReplaceModalOpen} onClose={handleCloseReplace} />
+      <FindInNotesModal isOpen={isFindInNotesModalOpen} onClose={handleCloseFindInNotes} />
+      <ReplaceInNotesModal isOpen={isReplacInNoteseModalOpen} onClose={handleCloseReplaceInNotes} />
       <SideMenu 
         notes={mockNotes}
         width={sideMenuWidth} 
