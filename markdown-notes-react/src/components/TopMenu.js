@@ -6,7 +6,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 
-const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceInNotes }) => {
+const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceInNotes, handleSaveAs }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const [fileMenuAnchorEl, setFileMenuAnchorEl] = useState(null);
   const [editMenuAnchorEl, setEditMenuAnchorEl] = useState(null);
@@ -25,7 +25,7 @@ const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceIn
   // View Menu handlers
   const handleViewMenuOpen = (event) =>
     setViewMenuAnchorEl(event.currentTarget);
-  const handleViewMenuClose = () => setViewMenuAnchorEl(null);
+  const handleViewMenuClose = () => setViewMenuAnchorEl(null);  
 
   return (
     <AppBar sx={{ height: 20, boxShadow: "none" }}>
@@ -115,7 +115,14 @@ const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceIn
         >
           <MenuItem onClick={handleFileMenuClose}>Open</MenuItem>
           <MenuItem onClick={handleFileMenuClose}>Save</MenuItem>
-          <MenuItem onClick={handleFileMenuClose}>Save As</MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleSaveAs();
+              handleFileMenuClose();
+            }}
+          >
+            Save As
+          </MenuItem>
           <MenuItem onClick={handleFileMenuClose}>New Note</MenuItem>
           <MenuItem onClick={handleFileMenuClose}>New Page</MenuItem>
         </Menu>

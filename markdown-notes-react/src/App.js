@@ -15,19 +15,17 @@ const mockNotes = [
     id: 1,
     title: "Note 1",
     pages: [
-      // Updated from 'tabs' to 'pages'
-      { id: 1, title: "Page 1" },
-      { id: 2, title: "Page 2" },
+      { id: 1, title: "Page 1", content: "" },
+      { id: 2, title: "Page 2", content: "" },
     ],
   },
   {
     id: 2,
     title: "Note 2",
     pages: [
-      // Updated from 'tabs' to 'pages'
-      { id: 3, title: "Page 1" },
-      { id: 4, title: "Page 2" },
-      { id: 5, title: "Page 3" },
+      { id: 3, title: "Page 1", content: "" },
+      { id: 4, title: "Page 2", content: "" },
+      { id: 5, title: "Page 3", content: "" },
     ],
   },
 ];
@@ -64,9 +62,36 @@ function App() {
   const handleCloseFindInNotes = () => setFindInNotesModalOpen(false);
 
   // ReplaceInNotesModal Handlers
-  const [isReplacInNoteseModalOpen, setReplaceInNotesModalOpen] = useState(false);
+  const [isReplacInNoteseModalOpen, setReplaceInNotesModalOpen] =
+    useState(false);
   const handleOpenReplaceInNotes = () => setReplaceInNotesModalOpen(true);
   const handleCloseReplaceInNotes = () => setReplaceInNotesModalOpen(false);
+
+  // FilePath and Save Handlers
+  const [currentFilePath, setCurrentFilePath] = useState(null);
+
+  const handleSaveAs = async () => {
+    try {
+      const options = {
+        suggestedName: "notes.json",
+        types: [
+          {
+            description: "JSON Files",
+            accept: { "application/json": [".json"] },
+          },
+        ],
+      };
+      const handle = await window.showSaveFilePicker(options);
+      const writable = await handle.createWritable();
+      await writable.write(JSON.stringify(mockNotes, null, 2));
+      await writable.close();
+      setCurrentFilePath(handle); // Save the file handle for future saves
+      alert("File saved successfully!");
+    } catch (error) {
+      console.error("Error saving file:", error);
+      alert("Failed to save file.");
+    }
+  };  
 
   // Editor Height Resizing Logic
   useEffect(() => {
@@ -116,15 +141,28 @@ function App() {
 
   return (
     <div>
-      <TopMenu onOpenFind={handleOpenFind} onOpenReplace={handleOpenReplace} onOpenFindInNotes={handleOpenFindInNotes} onOpenReplaceInNotes={handleOpenReplaceInNotes} />
+      <TopMenu
+        onOpenFind={handleOpenFind}
+        onOpenReplace={handleOpenReplace}
+        onOpenFindInNotes={handleOpenFindInNotes}
+        onOpenReplaceInNotes={handleOpenReplaceInNotes}
+        handleSaveAs={handleSaveAs}
+      />
       <FindModal isOpen={isFindModalOpen} onClose={handleCloseFind} />
       <ReplaceModal isOpen={isReplaceModalOpen} onClose={handleCloseReplace} />
-      <FindInNotesModal isOpen={isFindInNotesModalOpen} onClose={handleCloseFindInNotes} />
-      <ReplaceInNotesModal isOpen={isReplacInNoteseModalOpen} onClose={handleCloseReplaceInNotes} />
-      <SideMenu 
+      <FindInNotesModal
+        isOpen={isFindInNotesModalOpen}
+        onClose={handleCloseFindInNotes}
+      />
+      <ReplaceInNotesModal
+        isOpen={isReplacInNoteseModalOpen}
+        onClose={handleCloseReplaceInNotes}
+      />
+      <SideMenu
         notes={mockNotes}
-        width={sideMenuWidth} 
-        onMouseDown={handleMouseDownMenu} />
+        width={sideMenuWidth}
+        onMouseDown={handleMouseDownMenu}
+      />
       <TabBar sideMenuWidth={sideMenuWidth} />
       <Editor
         sideMenuWidth={sideMenuWidth}
@@ -132,10 +170,7 @@ function App() {
         height={height}
         onMouseDown={handleMouseDownEditor}
       />
-      <Preview 
-        editorHeight={height}
-        sideMenuWidth={sideMenuWidth}
-      />
+      <Preview editorHeight={height} sideMenuWidth={sideMenuWidth} />
       <BottomBar />
     </div>
   );
