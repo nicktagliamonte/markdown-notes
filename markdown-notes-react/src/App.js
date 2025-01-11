@@ -10,27 +10,30 @@ import Editor from "./components/Editor";
 import Preview from "./components/Preview";
 import BottomBar from "./components/BottomBar";
 
-const mockNotes = [
-  {
-    id: 1,
-    title: "Note 1",
-    pages: [
-      { id: 1, title: "Page 1", content: "" },
-      { id: 2, title: "Page 2", content: "" },
-    ],
-  },
-  {
-    id: 2,
-    title: "Note 2",
-    pages: [
-      { id: 3, title: "Page 1", content: "" },
-      { id: 4, title: "Page 2", content: "" },
-      { id: 5, title: "Page 3", content: "" },
-    ],
-  },
-];
-
 function App() {
+  // Notes
+  const [notes, setNotes] = useState([
+    {
+      id: 1,
+      title: "Note 1",
+      pages: [
+        { id: 1, title: "Page 1", content: "" },
+        { id: 2, title: "Page 2", content: "" },
+      ],
+    },
+    {
+      id: 2,
+      title: "Note 2",
+      pages: [
+        { id: 3, title: "Page 1", content: "" },
+        { id: 4, title: "Page 2", content: "" },
+        { id: 5, title: "Page 3", content: "" },
+      ],
+    },
+  ]);
+
+
+
   // Editor Resizing State
   const [isResizing, setIsResizing] = useState(false);
   const [startY, setStartY] = useState(0);
@@ -83,7 +86,7 @@ function App() {
       };
       const handle = await window.showSaveFilePicker(options);
       const writable = await handle.createWritable();
-      await writable.write(JSON.stringify(mockNotes, null, 2));
+      await writable.write(JSON.stringify(notes, null, 2));
       await writable.close();
       setCurrentFilePath(handle); // Save the file handle for future saves
       alert("File saved successfully!");
@@ -92,6 +95,56 @@ function App() {
       alert("Failed to save file.");
     }
   };  
+
+  const handleSave = async () => {
+    if (!currentFilePath) {
+      handleSaveAs();
+    }
+    try {
+      const writable = await currentFilePath.createWritable();
+      await writable.write(JSON.stringify(notes, null, 2));
+      await writable.close();
+      alert("File saved successfully!");
+    } catch (error) {
+      console.error("Error saving file:", error);
+      alert("Failed to save file.");
+    }
+  };
+
+  // Load file picker
+  const handleOpen = async () => {
+    try {
+      const [fileHandle] = await window.showOpenFilePicker({
+        types: [
+          {
+            description: "JSON Files",
+            accept: { "application/json": [".json"] },
+          },
+        ],
+      });
+      const file = await fileHandle.getFile();
+      const text = await file.text();
+      const data = JSON.parse(text);
+  
+      // Validate the data structure
+      if (!Array.isArray(data) || !data.every(validateNote)) {
+        throw new Error("Invalid file format");
+      }
+  
+      setNotes(data); // Replace notes with the loaded data
+      setCurrentFilePath(fileHandle); // Track the file handle for future saves
+      alert("File loaded successfully!");
+    } catch (error) {
+      console.error("Error opening file:", error);
+      alert("Failed to open file. Ensure it is a valid JSON file.");
+    }
+  };
+  
+  const validateNote = (note) =>
+    note.id &&
+    typeof note.title === "string" &&
+    Array.isArray(note.pages) &&
+    note.pages.every((page) => page.id && typeof page.title === "string" && typeof page.content === "string");  
 
   // Editor Height Resizing Logic
   useEffect(() => {
@@ -147,6 +200,8 @@ function App() {
         onOpenFindInNotes={handleOpenFindInNotes}
         onOpenReplaceInNotes={handleOpenReplaceInNotes}
         handleSaveAs={handleSaveAs}
+        handleSave={handleSave}
+        handleOpen={handleOpen}
       />
       <FindModal isOpen={isFindModalOpen} onClose={handleCloseFind} />
       <ReplaceModal isOpen={isReplaceModalOpen} onClose={handleCloseReplace} />
@@ -159,7 +214,7 @@ function App() {
         onClose={handleCloseReplaceInNotes}
       />
       <SideMenu
-        notes={mockNotes}
+        notes={notes}
         width={sideMenuWidth}
         onMouseDown={handleMouseDownMenu}
       />

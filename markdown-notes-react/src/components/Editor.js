@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles';
 
 const Editor = ({ sideMenuWidth, tabBarHeight, height, onMouseDown }) => {
   const theme = useTheme();
-  const [editorContent, setEditorContent] = useState("");
+  const [editorContent, setEditorContent] = useState("" );
 
   return (
     <div

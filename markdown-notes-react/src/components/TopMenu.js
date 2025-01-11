@@ -6,7 +6,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 
-const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceInNotes, handleSaveAs }) => {
+const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceInNotes, handleSaveAs, handleSave, handleOpen }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const [fileMenuAnchorEl, setFileMenuAnchorEl] = useState(null);
   const [editMenuAnchorEl, setEditMenuAnchorEl] = useState(null);
@@ -113,8 +113,22 @@ const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceIn
           open={Boolean(fileMenuAnchorEl)}
           onClose={handleFileMenuClose}
         >
-          <MenuItem onClick={handleFileMenuClose}>Open</MenuItem>
-          <MenuItem onClick={handleFileMenuClose}>Save</MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleOpen();
+              handleFileMenuClose();
+            }}
+          >
+            Open
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleSave();
+              handleFileMenuClose();
+            }}
+          >
+            Save
+          </MenuItem>
           <MenuItem
             onClick={() => {
               handleSaveAs();
