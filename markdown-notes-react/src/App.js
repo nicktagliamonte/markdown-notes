@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import FindModal from "./components/FindModal";
 import ReplaceModal from "./components/ReplaceModal";
@@ -32,8 +33,6 @@ function App() {
     },
   ]);
 
-
-
   // Editor Resizing State
   const [isResizing, setIsResizing] = useState(false);
   const [startY, setStartY] = useState(0);
@@ -49,46 +48,49 @@ function App() {
   // TabBar Height
   const [tabBarHeight] = useState(70); // Fixed TabBar height
 
-  // FindModal Handlers
-  const [isFindModalOpen, setFindModalOpen] = useState(false);
-  const handleOpenFind = () => setFindModalOpen(true);
-  const handleCloseFind = () => setFindModalOpen(false);
+  const [modals, setModals] = useState({
+    find: false,
+    replace: false,
+    findInNotes: false,
+    replaceInNotes: false,
+  });
 
-  // ReplaceModal Handlers
-  const [isReplaceModalOpen, setReplaceModalOpen] = useState(false);
-  const handleOpenReplace = () => setReplaceModalOpen(true);
-  const handleCloseReplace = () => setReplaceModalOpen(false);
-
-  // FindInNotesModal Handlers
-  const [isFindInNotesModalOpen, setFindInNotesModalOpen] = useState(false);
-  const handleOpenFindInNotes = () => setFindInNotesModalOpen(true);
-  const handleCloseFindInNotes = () => setFindInNotesModalOpen(false);
-
-  // ReplaceInNotesModal Handlers
-  const [isReplacInNoteseModalOpen, setReplaceInNotesModalOpen] =
-    useState(false);
-  const handleOpenReplaceInNotes = () => setReplaceInNotesModalOpen(true);
-  const handleCloseReplaceInNotes = () => setReplaceInNotesModalOpen(false);
+  const openModal = (modal) =>
+    setModals((prev) => ({ ...prev, [modal]: true }));
+  const closeModal = (modal) =>
+    setModals((prev) => ({ ...prev, [modal]: false }));
 
   // FilePath and Save Handlers
   const [currentFilePath, setCurrentFilePath] = useState(null);
 
+  const saveFile = async (fileHandle, content) => {
+    const writable = await fileHandle.createWritable();
+    await writable.write(content);
+    await writable.close();
+  };
+  
   const handleSaveAs = async () => {
     try {
       const options = {
         suggestedName: "notes.json",
         types: [
-          {
-            description: "JSON Files",
-            accept: { "application/json": [".json"] },
-          },
+          { description: "JSON Files", accept: { "application/json": [".json"] } },
         ],
       };
-      const handle = await window.showSaveFilePicker(options);
-      const writable = await handle.createWritable();
-      await writable.write(JSON.stringify(notes, null, 2));
-      await writable.close();
-      setCurrentFilePath(handle); // Save the file handle for future saves
+      const fileHandle = await window.showSaveFilePicker(options);
+      await saveFile(fileHandle, JSON.stringify(notes, null, 2));
+      setCurrentFilePath(fileHandle);
+      alert("File saved successfully!");
+    } catch (error) {
+      console.error("Error saving file:", error);
+      alert("Failed to save file.");
+    }
+  };
+  
+  const handleSave = async () => {
+    if (!currentFilePath) return handleSaveAs();
+    try {
+      await saveFile(currentFilePath, JSON.stringify(notes, null, 2));
       alert("File saved successfully!");
     } catch (error) {
       console.error("Error saving file:", error);
@@ -96,20 +98,30 @@ function App() {
     }
   };  
 
-  const handleSave = async () => {
-    if (!currentFilePath) {
-      handleSaveAs();
-    }
-    try {
-      const writable = await currentFilePath.createWritable();
-      await writable.write(JSON.stringify(notes, null, 2));
-      await writable.close();
-      alert("File saved successfully!");
-    } catch (error) {
-      console.error("Error saving file:", error);
-      alert("Failed to save file.");
-    }
-  };
+  useEffect(() => {
+    if (!currentFilePath) return;
+
+    const autosaveInterval = setInterval(() => {
+      handleSave();
+    }, 5 * 60 * 1000); // Save every 5 minutes
+
+    return () => clearInterval(autosaveInterval); // Cleanup on component unmount
+  }, [currentFilePath, handleSave, notes]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+        event.preventDefault();
+        handleSave();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleSave]);
 
   // Load file picker
   const handleOpen = async () => {
@@ -125,12 +137,12 @@ function App() {
       const file = await fileHandle.getFile();
       const text = await file.text();
       const data = JSON.parse(text);
-  
+
       // Validate the data structure
       if (!Array.isArray(data) || !data.every(validateNote)) {
         throw new Error("Invalid file format");
       }
-  
+
       setNotes(data); // Replace notes with the loaded data
       setCurrentFilePath(fileHandle); // Track the file handle for future saves
       alert("File loaded successfully!");
@@ -139,12 +151,17 @@ function App() {
       alert("Failed to open file. Ensure it is a valid JSON file.");
     }
   };
-  
+
   const validateNote = (note) =>
     note.id &&
     typeof note.title === "string" &&
     Array.isArray(note.pages) &&
-    note.pages.every((page) => page.id && typeof page.title === "string" && typeof page.content === "string");  
+    note.pages.every(
+      (page) =>
+        page.id &&
+        typeof page.title === "string" &&
+        typeof page.content === "string"
+    );
 
   // Editor Height Resizing Logic
   useEffect(() => {
@@ -192,40 +209,35 @@ function App() {
     setStartWidth(sideMenuWidth);
   };
 
+  // EditorContent
+  const [editorContent, setEditorContent] = useState(""); // Shared state
+
   return (
     <div>
       <TopMenu
-        onOpenFind={handleOpenFind}
-        onOpenReplace={handleOpenReplace}
-        onOpenFindInNotes={handleOpenFindInNotes}
-        onOpenReplaceInNotes={handleOpenReplaceInNotes}
+        onOpenFind={() => openModal("find")}
+        onOpenReplace={() => openModal("replace")}
+        onOpenFindInNotes={() => openModal("findInNotes")}
+        onOpenReplaceInNotes={() => openModal("replaceInNotes")}
         handleSaveAs={handleSaveAs}
         handleSave={handleSave}
         handleOpen={handleOpen}
       />
-      <FindModal isOpen={isFindModalOpen} onClose={handleCloseFind} />
-      <ReplaceModal isOpen={isReplaceModalOpen} onClose={handleCloseReplace} />
-      <FindInNotesModal
-        isOpen={isFindInNotesModalOpen}
-        onClose={handleCloseFindInNotes}
-      />
-      <ReplaceInNotesModal
-        isOpen={isReplacInNoteseModalOpen}
-        onClose={handleCloseReplaceInNotes}
-      />
-      <SideMenu
-        notes={notes}
-        width={sideMenuWidth}
-        onMouseDown={handleMouseDownMenu}
-      />
+      <FindModal isOpen={modals.find} onClose={() => closeModal("find")} />
+      <ReplaceModal isOpen={modals.replace} onClose={() => closeModal("replace")} />
+      <FindInNotesModal isOpen={modals.findInNotes} onClose={() => closeModal("findInNotes")} />
+      <ReplaceInNotesModal isOpen={modals.replaceInNotes} onClose={() => closeModal("replaceInNotes")} />
+      <SideMenu notes={notes} width={sideMenuWidth} onMouseDown={handleMouseDownMenu} />
       <TabBar sideMenuWidth={sideMenuWidth} />
       <Editor
         sideMenuWidth={sideMenuWidth}
         tabBarHeight={tabBarHeight}
         height={height}
         onMouseDown={handleMouseDownEditor}
+        editorContent={editorContent} 
+        setEditorContent={setEditorContent} 
       />
-      <Preview editorHeight={height} sideMenuWidth={sideMenuWidth} />
+      <Preview editorHeight={height} sideMenuWidth={sideMenuWidth} editorContent={editorContent}/>
       <BottomBar />
     </div>
   );

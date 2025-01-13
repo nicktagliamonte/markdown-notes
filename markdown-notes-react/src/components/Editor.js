@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTheme } from '@mui/material/styles';
 
-const Editor = ({ sideMenuWidth, tabBarHeight, height, onMouseDown }) => {
+const Editor = ({ sideMenuWidth, tabBarHeight, height, onMouseDown, editorContent, setEditorContent }) => {
   const theme = useTheme();
-  const [editorContent, setEditorContent] = useState("" );
 
   return (
     <div
