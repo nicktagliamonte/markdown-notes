@@ -4,54 +4,24 @@ import { Box, IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close"; // Import the Close icon
 
-const TabBar = ({ sideMenuWidth, pages, editorContent, setEditorContent }) => {
-  // State to track tabs and active tab
-  const [tabs, setTabs] = useState(pages || []);
+const TabBar = ({ sideMenuWidth, pages }) => {
+  // State to track the active tab
   const [activeTabId, setActiveTabId] = useState(null);
-
-  // State to track the next tab number (for add functionality)
-  const [nextTabNumber, setNextTabNumber] = useState(pages.length + 1);
 
   // Function to handle tab click to set active tab
   const handleTabClick = (id) => {
     setActiveTabId(id);
-    setEditorContent(pages.find((page) => page.id === id)?.content || "");
   };
 
+  // Function to handle closing a tab
   const handleCloseTab = (idToRemove) => {
-    const remainingTabs = tabs.filter((tab) => tab.id !== idToRemove);
+    // Filter out the tab to remove (for now we are not actually modifying the pages prop)
+    const remainingTabs = pages.filter((page) => page.id !== idToRemove);
 
-    // If the closed tab is the active tab, reset the active tab
+    // Set a new active tab if the current active tab is closed
     if (idToRemove === activeTabId) {
-      // Set new active tab if one exists, otherwise set null
-      const newActiveTabId = remainingTabs[0]?.id || null;
-      setActiveTabId(newActiveTabId);
-
-      // Set editor content to the content of the new active tab
-      setEditorContent(
-        pages.find((page) => page.id === newActiveTabId)?.content || ""
-      );
+      setActiveTabId(remainingTabs[0]?.id || null);
     }
-
-    // Update the tabs state with remaining tabs
-    setTabs(remainingTabs);
-  };
-
-  // Function to handle adding a new tab
-  const handleAddTab = () => {
-    const newTab = {
-      id: nextTabNumber,
-      title: `Tab ${nextTabNumber}`,
-      content: "",
-    };
-    setTabs((prevTabs) => [...prevTabs, newTab]); // Add new tab to the list
-    setNextTabNumber((prevNumber) => prevNumber + 1); // Increment nextTabNumber
-
-    // Set new tab as active
-    setActiveTabId(newTab.id);
-
-    // Set editor content for the new active tab
-    setEditorContent(newTab.content || ""); // Use the content field from the newTab
   };
 
   return (
@@ -69,23 +39,6 @@ const TabBar = ({ sideMenuWidth, pages, editorContent, setEditorContent }) => {
         borderColor: "divider", // Dynamic color from the theme
       }}
     >
-      {/* Row 0: Active Note Name */}
-      <Box
-        sx={{
-          flex: "1 1 auto",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "left",
-          padding: "0 8px",
-          fontWeight: "bold",
-          height: "20px",
-          color: "text.primary",
-          whiteSpace: "nowrap", // Prevents tabs from wrapping
-        }}
-      >
-        Active Note Name
-      </Box>
-
       {/* Row 1: Tabs */}
       <Box
         sx={{
@@ -113,18 +66,17 @@ const TabBar = ({ sideMenuWidth, pages, editorContent, setEditorContent }) => {
           paddingBottom: "8px", // Leaves space for scrollbar
         }}
       >
-        {/* Dynamically render tabs */}
-        {tabs.map((tab) => (
+        {/* Dynamically render pages as tabs */}
+        {pages.map((page) => (
           <Box
-            key={tab.id} // Use the unique id for each tab
+            key={page.id} // Use the unique id for each page
             sx={{
               display: "flex",
               alignItems: "center",
               padding: "0px 4px",
               fontSize: 15,
               height: 20,
-              backgroundColor:
-                activeTabId === tab.id ? "primary.dark" : "primary.paper", // Highlight active tab
+              backgroundColor: activeTabId === page.id ? "primary.main" : "primary.light", // Highlight active tab
               borderRadius: "4px",
               color: "primary.contrastText",
               cursor: "pointer",
@@ -132,9 +84,9 @@ const TabBar = ({ sideMenuWidth, pages, editorContent, setEditorContent }) => {
                 backgroundColor: "primary.dark",
               },
             }}
-            onClick={() => handleTabClick(tab.id)} // Set active tab on click
+            onClick={() => handleTabClick(page.id)} // Set active tab on click
           >
-            {tab.title}
+            {page.title}
 
             {/* Close Button (X) */}
             <IconButton
@@ -149,7 +101,7 @@ const TabBar = ({ sideMenuWidth, pages, editorContent, setEditorContent }) => {
               }}
               onClick={(e) => {
                 e.stopPropagation(); // Prevent tab click from triggering active tab change
-                handleCloseTab(tab.id); // Close tab by unique id
+                handleCloseTab(page.id); // Close tab by unique id
               }}
             >
               <CloseIcon sx={{ fontSize: "16px" }} />
@@ -171,7 +123,6 @@ const TabBar = ({ sideMenuWidth, pages, editorContent, setEditorContent }) => {
               backgroundColor: "primary.dark",
             },
           }}
-          onClick={handleAddTab} // Add new tab when clicked
         >
           <AddIcon sx={{ fontSize: "16px" }} /> {/* Smaller icon size */}
         </IconButton>

@@ -17,7 +17,7 @@ function App() {
       id: 1,
       title: "Note 1",
       pages: [
-        { id: 1, title: "Page 1", content: "test" },
+        { id: 1, title: "Page 1", content: "" },
         { id: 2, title: "Page 2", content: "" },
       ],
     },
@@ -31,9 +31,6 @@ function App() {
       ],
     },
   ]);
-
-  // Temporary for developing the tab bar:
-  const note1Pages = notes.find((note) => note.id === 1)?.pages || [];
 
   // Editor Resizing State
   const [isResizing, setIsResizing] = useState(false);
@@ -256,9 +253,6 @@ function App() {
         notes={notes}
         activeTabId={activeTabId}
         setActiveTabId={setActiveTabId}
-        pages = {note1Pages}
-        editorContent={editorContent}
-        setEditorContent={setEditorContent}
       />
       <Editor
         sideMenuWidth={sideMenuWidth}
