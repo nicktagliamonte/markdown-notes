@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import FindModal from "./components/FindModal";
 import ReplaceModal from "./components/ReplaceModal";
 import FindInNotesModal from "./components/FindInNotesModal";
@@ -9,6 +9,7 @@ import TabBar from "./components/TabBar";
 import Editor from "./components/Editor";
 import Preview from "./components/Preview";
 import BottomBar from "./components/BottomBar";
+import ConfirmationModal from "./components/ConfirmationModal";
 
 function App() {
   // Notes
@@ -18,7 +19,11 @@ function App() {
       title: "Note 1",
       pages: [
         { id: 1, title: "Page 1", content: "test" },
-        { id: 2, title: "Page 2", content: "" },
+        {
+          id: 2,
+          title: "Page 2",
+          content: "test content for page two, distinct from page one",
+        },
       ],
     },
     {
@@ -29,6 +34,11 @@ function App() {
         { id: 4, title: "Page 2", content: "" },
         { id: 5, title: "Page 3", content: "" },
       ],
+    },
+    {
+      id: 3,
+      title: "Note 3",
+      pages: [{ id: 6, title: "Page 1", content: "" }],
     },
   ]);
 
@@ -62,7 +72,7 @@ function App() {
   const [activeTabId, setActiveTabId] = useState(null);
 
   // Editor Content
-  const [editorContent, setEditorContent] = useState(""); // Shared state for content
+  const [editorContent, setEditorContent] = useState(null); // Shared state for content
 
   const openModal = (modal) =>
     setModals((prev) => ({ ...prev, [modal]: true }));
@@ -222,6 +232,37 @@ function App() {
     setStartWidth(sideMenuWidth);
   };
 
+  const tabBarRef = useRef(null);
+
+  const handleAddTabFromPage = (page) => {
+    // Call the function defined in TabBar.js to add a new tab
+    tabBarRef.current.handleAddTabFromPage(page);
+  };
+
+  const closeAllTabs = () => {
+    tabBarRef.current.closeAllTabs();
+  };
+
+  const [activeNoteId, setActiveNoteId] = useState(null);
+
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [nextPage, setNextPage] = useState(null);
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
+  const parentNote = nextPage === null ? "" : notes.find((note) => note.pages.some((p) => p.id === nextPage.id));
+  
+  const handleModalConfirm = () => {
+    closeAllTabs();
+    setActiveNoteId(parentNote.id);
+    handleAddTabFromPage(nextPage);
+    setModalOpen(false);
+  }
+
   return (
     <div>
       <TopMenu
@@ -250,15 +291,30 @@ function App() {
         notes={notes}
         width={sideMenuWidth}
         onMouseDown={handleMouseDownMenu}
+        handleAddTabFromPage={handleAddTabFromPage}
+        activeNoteId={activeNoteId}
+        setActiveNoteId={setActiveNoteId}
+        closeAllTabs={closeAllTabs}
+        unsavedChanges={unsavedChanges}
+        setNextPage = {setNextPage}
+        setModalOpen={setModalOpen}
       />
       <TabBar
         sideMenuWidth={sideMenuWidth}
         notes={notes}
         activeTabId={activeTabId}
         setActiveTabId={setActiveTabId}
-        pages = {note1Pages}
+        pages={note1Pages}
         editorContent={editorContent}
         setEditorContent={setEditorContent}
+        ref={tabBarRef}
+        activeNoteId={activeNoteId}
+        setActiveNoteId={setActiveNoteId}
+      />
+      <ConfirmationModal
+        open={modalOpen}
+        onClose={handleModalClose}
+        onConfirm={handleModalConfirm}
       />
       <Editor
         sideMenuWidth={sideMenuWidth}
@@ -267,6 +323,7 @@ function App() {
         onMouseDown={handleMouseDownEditor}
         editorContent={editorContent}
         setEditorContent={setEditorContent}
+        setUnsavedChanges={setUnsavedChanges}
       />
       <Preview
         editorHeight={height}
