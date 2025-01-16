@@ -100,8 +100,9 @@ const TabBar = forwardRef(
     };
 
     const closeAllTabs = () => {
-      setTabs([]);  // Or whichever method resets your tabs
-      setActiveTabId(null);  // Optionally, reset active tab to null
+      setTabs([]);
+      setActiveTabId(null);
+      setActivePageId(null);
     };    
 
     useImperativeHandle(ref, () => ({
