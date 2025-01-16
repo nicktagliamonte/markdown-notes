@@ -13,8 +13,8 @@ const TabBar = forwardRef(
       activeTabId,
       setActiveTabId,
       activeNoteId,
-      setActiveNoteId,
-      notes
+      notes,
+      setActivePageId
     },
     ref
   ) => {
@@ -26,6 +26,7 @@ const TabBar = forwardRef(
     // Function to handle tab click to set active tab
     const handleTabClick = (id) => {
       setActiveTabId(id);
+      setActivePageId(id);
       setEditorContent(pages.find((page) => page.id === id)?.content || "");
     };
 
@@ -65,6 +66,7 @@ const TabBar = forwardRef(
 
       // Set new tab as active
       setActiveTabId(newTab.id);
+      setActivePageId(newTab.id);
 
       // Set editor content for the new active tab
       setEditorContent(newTab.content || ""); // Use the content field from the newTab

@@ -9,7 +9,19 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
 
-const SideMenu = ({ notes, width, onMouseDown, handleAddTabFromPage, closeAllTabs, activeNoteId, setActiveNoteId, setNextPage, setModalOpen, unsavedChanges }) => {
+const SideMenu = ({
+  notes,
+  width,
+  onMouseDown,
+  handleAddTabFromPage,
+  closeAllTabs,
+  activeNoteId,
+  setActiveNoteId,
+  setActivePageId,
+  setNextPage,
+  setModalOpen,
+  unsavedChanges,
+}) => {
   const theme = useTheme();
   const [expandedNote, setExpandedNote] = useState(null);
 
@@ -19,8 +31,10 @@ const SideMenu = ({ notes, width, onMouseDown, handleAddTabFromPage, closeAllTab
 
   const handlePageClick = (page) => {
     // Find the note that contains the clicked page
-    const parentNote = notes.find((note) => note.pages.some((p) => p.id === page.id));
-  
+    const parentNote = notes.find((note) =>
+      note.pages.some((p) => p.id === page.id)
+    );
+
     if (parentNote) {
       if (parentNote.id !== activeNoteId) {
         if (unsavedChanges) {
@@ -29,13 +43,14 @@ const SideMenu = ({ notes, width, onMouseDown, handleAddTabFromPage, closeAllTab
         } else {
           closeAllTabs();
           setActiveNoteId(parentNote.id);
+          setActivePageId(page.id);
         }
       }
-  
+
       // Open the corresponding tab for the clicked page
       handleAddTabFromPage(page);
     }
-  };  
+  };
 
   return (
     <div style={{ display: "flex", height: "calc(100vh - 25px)" }}>

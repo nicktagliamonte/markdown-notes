@@ -18,11 +18,12 @@ function App() {
       id: 1,
       title: "Note 1",
       pages: [
-        { id: 1, title: "Page 1", content: "test" },
+        { id: 1, title: "Page 1", content: "test", tempContent: "" },
         {
           id: 2,
           title: "Page 2",
-          content: "test content for page two, distinct from page one",
+          content: "# test content for page two, distinct from page one",
+          tempContent: "",
         },
       ],
     },
@@ -30,15 +31,15 @@ function App() {
       id: 2,
       title: "Note 2",
       pages: [
-        { id: 3, title: "Page 1", content: "" },
-        { id: 4, title: "Page 2", content: "" },
-        { id: 5, title: "Page 3", content: "" },
+        { id: 3, title: "Page 1", content: "", tempContent: "" },
+        { id: 4, title: "Page 2", content: "", tempContent: "" },
+        { id: 5, title: "Page 3", content: "", tempContent: "" },
       ],
     },
     {
       id: 3,
       title: "Note 3",
-      pages: [{ id: 6, title: "Page 1", content: "" }],
+      pages: [{ id: 6, title: "Page 1", content: "", tempContent: "" }],
     },
   ]);
 
@@ -88,6 +89,26 @@ function App() {
     await writable.close();
   };
 
+  // Updates the active note by applying tempContent to content
+  const saveActiveNote = () => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) => {
+        if (note.id !== activeNoteId) return note; // Skip non-active notes
+        return {
+          ...note,
+          pages: note.pages.map((page) => {
+            if (page.tempContent === "") return page; // Skip pages with no tempContent
+            return {
+              ...page,
+              content: page.tempContent, // Update content with tempContent
+              tempContent: "", // Reset tempContent
+            };
+          }),
+        };
+      })
+    );
+  };
+
   const handleSaveAs = async () => {
     try {
       const options = {
@@ -100,6 +121,8 @@ function App() {
         ],
       };
       const fileHandle = await window.showSaveFilePicker(options);
+
+      saveActiveNote(); // Apply changes before saving
       await saveFile(fileHandle, JSON.stringify(notes, null, 2));
       setCurrentFilePath(fileHandle);
       alert("File saved successfully!");
@@ -113,6 +136,7 @@ function App() {
   const handleSave = async () => {
     if (!currentFilePath) return handleSaveAs();
     try {
+      saveActiveNote(); // Apply changes before saving
       await saveFile(currentFilePath, JSON.stringify(notes, null, 2));
       alert("File saved successfully!");
     } catch (error) {
@@ -244,6 +268,7 @@ function App() {
   };
 
   const [activeNoteId, setActiveNoteId] = useState(null);
+  const [activePageId, setActivePageId] = useState(null);
 
   const [unsavedChanges, setUnsavedChanges] = useState(false);
 
@@ -254,14 +279,18 @@ function App() {
     setModalOpen(false);
   };
 
-  const parentNote = nextPage === null ? "" : notes.find((note) => note.pages.some((p) => p.id === nextPage.id));
-  
+  const parentNote =
+    nextPage === null
+      ? ""
+      : notes.find((note) => note.pages.some((p) => p.id === nextPage.id));
+
   const handleModalConfirm = () => {
     closeAllTabs();
     setActiveNoteId(parentNote.id);
     handleAddTabFromPage(nextPage);
+    setActivePageId(nextPage.id);
     setModalOpen(false);
-  }
+  };
 
   return (
     <div>
@@ -294,9 +323,10 @@ function App() {
         handleAddTabFromPage={handleAddTabFromPage}
         activeNoteId={activeNoteId}
         setActiveNoteId={setActiveNoteId}
+        setActivePageId={setActivePageId}
         closeAllTabs={closeAllTabs}
         unsavedChanges={unsavedChanges}
-        setNextPage = {setNextPage}
+        setNextPage={setNextPage}
         setModalOpen={setModalOpen}
       />
       <TabBar
@@ -310,6 +340,7 @@ function App() {
         ref={tabBarRef}
         activeNoteId={activeNoteId}
         setActiveNoteId={setActiveNoteId}
+        setActivePageId={setActivePageId}
       />
       <ConfirmationModal
         open={modalOpen}
@@ -324,6 +355,10 @@ function App() {
         editorContent={editorContent}
         setEditorContent={setEditorContent}
         setUnsavedChanges={setUnsavedChanges}
+        notes={notes}
+        setNotes={setNotes}
+        activeNoteId={activeNoteId}
+        activePageId={activePageId}
       />
       <Preview
         editorHeight={height}

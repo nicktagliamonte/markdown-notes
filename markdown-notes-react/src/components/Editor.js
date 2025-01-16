@@ -9,8 +9,27 @@ const Editor = ({
   editorContent,
   setEditorContent,
   setUnsavedChanges,
+  notes,
+  setNotes,
+  activeNoteId,
+  activePageId,
 }) => {
   const theme = useTheme();
+
+  const setTempContent = (updatedContent) => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) => {
+        if (note.id !== activeNoteId) return note;
+        return {
+          ...note,
+          pages: note.pages.map((page) => {
+            if (page.id !== activePageId) return page;
+            return { ...page, tempContent: updatedContent };
+          }),
+        };
+      })
+    );
+  };
 
   return (
     <div
@@ -46,22 +65,40 @@ const Editor = ({
       ) : (
         // Editable textarea for active tab
         <textarea
-          value={editorContent}
+          value={(() => {
+            const currentNote = notes.find((note) => note.id === activeNoteId);
+            const currentPage = currentNote?.pages.find(
+              (page) => page.id === activePageId
+            );
+
+            // Check for tempContent: if it's non-empty, use it. If not, fall back to editorContent
+            if (currentPage?.tempContent !== "") {
+              setEditorContent(currentPage.tempContent);
+              return currentPage.tempContent; // Use tempContent if it exists and is not empty
+            }
+
+            return editorContent || currentPage?.content || ""; // Fallback to editorContent or content (if no tempContent)
+          })()} // Dynamically set the content based on tempContent or fallback to editorContent
           onChange={(e) => {
-            setEditorContent(e.target.value);
-            setUnsavedChanges(true);
+            const updatedValue = e.target.value;
+            setEditorContent(updatedValue); // Update editorContent with new input
+            setUnsavedChanges(true); // Mark changes as unsaved
+
+            // Update tempContent for the active page
+            setTempContent(updatedValue); // Set tempContent for the current page
           }}
           onKeyDown={(e) => {
             if (e.key === "Tab") {
               e.preventDefault();
               const start = e.target.selectionStart;
               const end = e.target.selectionEnd;
-              const value = editorContent;
 
-              const updatedValue =
-                value.substring(0, start) + "    " + value.substring(end);
-
-              setEditorContent(updatedValue);
+              const value =
+                editorContent.substring(0, start) +
+                "    " +
+                editorContent.substring(end);
+              setEditorContent(value);
+              setTempContent(value); // Sync tempContent with editorContent
 
               setTimeout(
                 () => e.target.setSelectionRange(start + 4, start + 4),
@@ -86,7 +123,6 @@ const Editor = ({
           disabled={editorContent === null || editorContent === undefined} // Disable editing when no active tab
         />
       )}
-
       {/* Resizable handle */}
       <div
         onMouseDown={onMouseDown}
