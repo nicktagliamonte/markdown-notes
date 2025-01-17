@@ -138,7 +138,6 @@ const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceIn
             Save As
           </MenuItem>
           <MenuItem onClick={handleFileMenuClose}>New Note</MenuItem>
-          <MenuItem onClick={handleFileMenuClose}>New Page</MenuItem>
         </Menu>
 
         {/* Edit Button and Menu */}
@@ -217,7 +216,6 @@ const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceIn
           >
             Replace In Notes
           </MenuItem>
-          <MenuItem onClick={handleEditMenuClose}>Hyperlink</MenuItem>
         </Menu>
 
         {/* View Button and Menu */}

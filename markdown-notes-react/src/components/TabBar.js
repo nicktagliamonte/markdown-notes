@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { forwardRef, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Box, IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close"; // Import the Close icon
@@ -14,14 +14,26 @@ const TabBar = forwardRef(
       setActiveTabId,
       activeNoteId,
       notes,
-      setActivePageId
+      setNotes,
+      setActivePageId,
     },
     ref
   ) => {
     const [tabs, setTabs] = useState([]);
 
     // State to track the next tab number (for add functionality)
-    const [nextTabNumber, setNextTabNumber] = useState(1);
+    const [nextTabNumber, setNextTabNumber] = useState(0);
+    const [nextTabId, setNextTabId] = useState(1);
+    useEffect(() => {
+      if (!activeNoteId || !notes) return;
+
+      const activeNote = notes.find((note) => note.id === activeNoteId);
+
+      if (activeNote && activeNote.pages.length > 0) {
+        const maxId = Math.max(...activeNote.pages.map((page) => page.id));
+        setNextTabId(maxId + 1);
+      }
+    }, [activeNoteId, notes]);
 
     // Function to handle tab click to set active tab
     const handleTabClick = (id) => {
@@ -57,12 +69,16 @@ const TabBar = forwardRef(
     // Function to handle adding a new tab
     const handleAddTab = () => {
       const newTab = {
-        id: nextTabNumber,
+        id: nextTabId,
         title: `Tab ${nextTabNumber}`,
         content: "",
+        tempContent: "", // Ensure new page has a tempContent field
       };
+
+      // Update tabs state
       setTabs((prevTabs) => [...prevTabs, newTab]); // Add new tab to the list
       setNextTabNumber((prevNumber) => prevNumber + 1); // Increment nextTabNumber
+      setNextTabId((prevNumber) => prevNumber + 1); // Increment nextTabId
 
       // Set new tab as active
       setActiveTabId(newTab.id);
@@ -70,6 +86,26 @@ const TabBar = forwardRef(
 
       // Set editor content for the new active tab
       setEditorContent(newTab.content || ""); // Use the content field from the newTab
+
+      // Add a new page to the pages array of the currently active note
+      setNotes((prevNotes) =>
+        prevNotes.map((note) =>
+          note.id === activeNoteId
+            ? {
+                ...note,
+                pages: [
+                  ...note.pages,
+                  {
+                    id: nextTabId,
+                    title: `Tab ${nextTabNumber}`,
+                    content: "",
+                    tempContent: "",
+                  },
+                ],
+              }
+            : note
+        )
+      );
     };
 
     const handleAddTabFromPage = (page) => {
@@ -90,6 +126,7 @@ const TabBar = forwardRef(
 
         setTabs((prevTabs) => [...prevTabs, newTab]);
         setNextTabNumber((prevNumber) => prevNumber + 1);
+        setNextTabId((prevNumber) => prevNumber + 1);
 
         // Set new tab as active
         setActiveTabId(newTab.id);
@@ -103,12 +140,12 @@ const TabBar = forwardRef(
       setTabs([]);
       setActiveTabId(null);
       setActivePageId(null);
-    };    
+    };
 
     useImperativeHandle(ref, () => ({
       handleAddTabFromPage,
       closeAllTabs,
-    }));    
+    }));
 
     return (
       <Box

@@ -332,6 +332,7 @@ function App() {
       <TabBar
         sideMenuWidth={sideMenuWidth}
         notes={notes}
+        setNotes={setNotes}
         activeTabId={activeTabId}
         setActiveTabId={setActiveTabId}
         pages={note1Pages}
