@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTheme } from "@mui/material/styles";
 import { Box, Button, TextField, Typography } from "@mui/material";
 
-const FindModal = ({ isOpen, onClose }) => {
+const FindModal = ({ isOpen, onClose, notes, activePageId, activeNoteId }) => {
   const theme = useTheme();
   const [isActive, setIsActive] = useState(true);
   const [position, setPosition] = useState({ top: 100, left: 100 }); // Initial modal position
   const [dragging, setDragging] = useState(false); // Track if dragging is happening
   const [startDragPos, setStartDragPos] = useState({ x: 0, y: 0 }); // Mouse start position
-
-  if (!isOpen) return null;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [occurrences, setOccurrences] = useState([]);
 
   const handleFocusInsideModal = (e) => {
     e.stopPropagation(); // Prevent bubbling to the overlay
@@ -41,6 +41,50 @@ const FindModal = ({ isOpen, onClose }) => {
   const handleMouseUp = () => {
     setDragging(false);
   };
+
+  // Get content for every page in every note
+  const getAllPageContents = useCallback(() => {
+    const allPages = [];
+    notes.forEach((note) => {
+      note.pages.forEach((page) => {
+        allPages.push({
+          noteId: note.id,
+          pageId: page.id,
+          content: page.content,
+          tempContent: page.tempContent,
+        });
+      });
+    });
+    return allPages;
+  }, [notes]);
+
+  // Find all occurrences of the search term across multiple pages
+  const findOccurrencesAcrossPages = useCallback((term, allPages) => {
+    if (!term) return [];
+
+    const results = [];
+    allPages.forEach(({ noteId, pageId, content, tempContent }) => {
+      const searchIn = tempContent !== "" ? tempContent : content;
+      if (!searchIn) return;
+
+      let index = searchIn.indexOf(term);
+      while (index !== -1) {
+        results.push({ noteId, pageId, index }); // Include note and page context
+        index = searchIn.indexOf(term, index + term.length);
+      }
+    });
+
+    return results;
+  }, []);
+
+  // Update occurrences when dependencies change
+  useEffect(() => {
+    const allPages = getAllPageContents();
+    const matches = findOccurrencesAcrossPages(searchTerm, allPages);
+    setOccurrences(matches);
+  }, [searchTerm, getAllPageContents, findOccurrencesAcrossPages]);
+
+  if (!isOpen) return null;
 
   return (
     <div

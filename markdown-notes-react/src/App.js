@@ -305,18 +305,36 @@ function App() {
         notes={notes}
         setNotes={setNotes}
       />
-      <FindModal isOpen={modals.find} onClose={() => closeModal("find")} />
+      <FindModal
+        isOpen={modals.find}
+        onClose={() => closeModal("find")}
+        notes={notes}
+        activePageId={activePageId}
+        activeNoteId={activeNoteId}
+      />
       <ReplaceModal
         isOpen={modals.replace}
         onClose={() => closeModal("replace")}
+        notes={notes}
+        setNotes={setNotes}
+        activePageId={activePageId}
+        activeNoteId={activeNoteId}
       />
       <FindInNotesModal
         isOpen={modals.findInNotes}
         onClose={() => closeModal("findInNotes")}
+        notes={notes}
+        setNotes={setNotes}
+        activePageId={activePageId}
+        activeNoteId={activeNoteId}
       />
       <ReplaceInNotesModal
         isOpen={modals.replaceInNotes}
         onClose={() => closeModal("replaceInNotes")}
+        notes={notes}
+        setNotes={setNotes}
+        activePageId={activePageId}
+        activeNoteId={activeNoteId}
       />
       <SideMenu
         notes={notes}

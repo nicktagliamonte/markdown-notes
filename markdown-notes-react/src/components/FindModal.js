@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTheme } from "@mui/material/styles";
 import { Box, Button, TextField, Typography } from "@mui/material";
 
-const FindModal = ({ isOpen, onClose }) => {
+const FindModal = ({ isOpen, onClose, notes, activePageId, activeNoteId }) => {
   const theme = useTheme();
   const [isActive, setIsActive] = useState(true);
   const [position, setPosition] = useState({ top: 100, left: 100 }); // Initial modal position
   const [dragging, setDragging] = useState(false); // Track if dragging is happening
   const [startDragPos, setStartDragPos] = useState({ x: 0, y: 0 }); // Mouse start position
-
-  if (!isOpen) return null;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [occurrences, setOccurrences] = useState([]);
 
   const handleFocusInsideModal = (e) => {
     e.stopPropagation(); // Prevent bubbling to the overlay
@@ -41,6 +41,44 @@ const FindModal = ({ isOpen, onClose }) => {
   const handleMouseUp = () => {
     setDragging(false);
   };
+
+  // Get content for the active page
+  const getCurrentPageContent = useCallback(() => {
+    const activeNote = notes.find((note) => note.id === activeNoteId);
+    if (!activeNote) return { content: "", tempContent: "" };
+
+    const activePage = activeNote.pages.find(
+      (page) => page.id === activePageId
+    );
+    return activePage || { content: "", tempContent: "" };
+  }, [notes, activePageId, activeNoteId]);
+
+  // Find all occurrences of the search term
+  const findOccurrences = useCallback((term, content, tempContent) => {
+    const searchIn = tempContent !== "" ? tempContent : content;
+    if (!term || !searchIn) return [];
+
+    const matches = [];
+    let index = searchIn.indexOf(term);
+    while (index !== -1) {
+      matches.push(index);
+      index = searchIn.indexOf(term, index + term.length);
+    }
+    return matches;
+  }, []);
+
+  // Update occurrences when dependencies change
+  useEffect(() => {
+    const currentPage = getCurrentPageContent();
+    const matches = findOccurrences(
+      searchTerm,
+      currentPage.content,
+      currentPage.tempContent
+    );
+    setOccurrences(matches);
+  }, [searchTerm, getCurrentPageContent, findOccurrences]);
+  
+  if (!isOpen) return null;
 
   return (
     <div
