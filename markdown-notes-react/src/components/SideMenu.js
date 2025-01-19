@@ -54,11 +54,16 @@ const SideMenu = ({
         } else {
           closeAllTabs();
           setActiveNoteId(parentNote.id);
-          setActivePageId(page.id);
         }
       }
       handleAddTabFromPage(page);
     }
+  };
+
+  const handlePageClickAndSetActivePage = (page) => {
+    handlePageClick(page); // Call your existing logic
+    setActivePageId(page.id); // Separate the active page ID update
+    console.log(page.id);
   };
 
   const handleContextMenu = (event, item, type) => {
@@ -182,7 +187,7 @@ const SideMenu = ({
                       key={page.id}
                       sx={{ pl: 4 }}
                       button
-                      onClick={() => handlePageClick(page)}
+                      onClick={() => handlePageClickAndSetActivePage(page)}
                       onContextMenu={(e) => handleContextMenu(e, page, "page")}
                     >
                       <ListItemText primary={page.title} />

@@ -9,7 +9,6 @@ import Button from "@mui/material/Button";
 const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceInNotes, handleSaveAs, handleSave, handleOpen, notes, setNotes }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const [fileMenuAnchorEl, setFileMenuAnchorEl] = useState(null);
-  const [editMenuAnchorEl, setEditMenuAnchorEl] = useState(null);
   const [viewMenuAnchorEl, setViewMenuAnchorEl] = useState(null);
 
   // File Menu handlers
@@ -38,11 +37,6 @@ const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceIn
     // Return the updated notes array with the new note
     return [...notes, newNote];
   };  
-
-  // Edit Menu handlers
-  const handleEditMenuOpen = (event) =>
-    setEditMenuAnchorEl(event.currentTarget);
-  const handleEditMenuClose = () => setEditMenuAnchorEl(null);
 
   // View Menu handlers
   const handleViewMenuOpen = (event) =>
@@ -166,84 +160,6 @@ const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceIn
             }}
           >
             New Note
-          </MenuItem>
-        </Menu>
-
-        {/* Edit Button and Menu */}
-        <Button
-          color="inherit"
-          onClick={handleEditMenuOpen}
-          sx={{
-            "@media (min-width: 0px)": {
-              padding: 0,
-              margin: 0,
-              minWidth: 0,
-              width: 50,
-            },
-            "@media (min-width: 600px)": {
-              padding: 0,
-              margin: 0,
-              minWidth: 0,
-              width: 50,
-            },
-            "@media (min-width: 960px)": {
-              padding: 0,
-              margin: 0,
-              minWidth: 0,
-              width: 50,
-            },
-            "@media (min-width: 1280px)": {
-              padding: 0,
-              margin: 0,
-              minWidth: 0,
-              width: 50,
-            },
-            "@media (min-width: 1920px)": {
-              padding: 0,
-              margin: 0,
-              minWidth: 0,
-              width: 50,
-            },
-          }}
-        >
-          Edit
-        </Button>
-        <Menu
-          anchorEl={editMenuAnchorEl}
-          open={Boolean(editMenuAnchorEl)}
-          onClose={handleEditMenuClose}
-        >
-          <MenuItem
-            onClick={() => {
-              onOpenFind();
-              handleEditMenuClose();
-            }}
-          >
-            Find
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              onOpenReplace();
-              handleEditMenuClose();
-            }}
-          >
-            Replace
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              onOpenFindInNotes();
-              handleEditMenuClose();
-            }}
-          >
-            Find In Notes
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              onOpenReplaceInNotes();
-              handleEditMenuClose();
-            }}
-          >
-            Replace In Notes
           </MenuItem>
         </Menu>
 

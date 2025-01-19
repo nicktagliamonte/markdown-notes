@@ -49,7 +49,7 @@ const Editor = ({
         // Static message for no active tab
         <div
           style={{
-            width: "100%",
+            width: "90%",
             height: "90%",
             padding: "20px",
             display: "flex",

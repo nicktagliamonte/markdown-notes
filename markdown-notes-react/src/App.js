@@ -1,8 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import FindModal from "./components/FindModal";
-import ReplaceModal from "./components/ReplaceModal";
-import FindInNotesModal from "./components/FindInNotesModal";
-import ReplaceInNotesModal from "./components/ReplaceInNotesModal";
 import TopMenu from "./components/TopMenu";
 import SideMenu from "./components/SideMenu";
 import TabBar from "./components/TabBar";
@@ -61,24 +57,11 @@ function App() {
   // TabBar Height
   const [tabBarHeight] = useState(70); // Fixed TabBar height
 
-  // Modal states
-  const [modals, setModals] = useState({
-    find: false,
-    replace: false,
-    findInNotes: false,
-    replaceInNotes: false,
-  });
-
   // Active Tab
   const [activeTabId, setActiveTabId] = useState(null);
 
   // Editor Content
   const [editorContent, setEditorContent] = useState(null); // Shared state for content
-
-  const openModal = (modal) =>
-    setModals((prev) => ({ ...prev, [modal]: true }));
-  const closeModal = (modal) =>
-    setModals((prev) => ({ ...prev, [modal]: false }));
 
   // FilePath and Save Handlers
   const [currentFilePath, setCurrentFilePath] = useState(null);
@@ -295,46 +278,11 @@ function App() {
   return (
     <div>
       <TopMenu
-        onOpenFind={() => openModal("find")}
-        onOpenReplace={() => openModal("replace")}
-        onOpenFindInNotes={() => openModal("findInNotes")}
-        onOpenReplaceInNotes={() => openModal("replaceInNotes")}
         handleSaveAs={handleSaveAs}
         handleSave={handleSave}
         handleOpen={handleOpen}
         notes={notes}
         setNotes={setNotes}
-      />
-      <FindModal
-        isOpen={modals.find}
-        onClose={() => closeModal("find")}
-        notes={notes}
-        activePageId={activePageId}
-        activeNoteId={activeNoteId}
-      />
-      <ReplaceModal
-        isOpen={modals.replace}
-        onClose={() => closeModal("replace")}
-        notes={notes}
-        setNotes={setNotes}
-        activePageId={activePageId}
-        activeNoteId={activeNoteId}
-      />
-      <FindInNotesModal
-        isOpen={modals.findInNotes}
-        onClose={() => closeModal("findInNotes")}
-        notes={notes}
-        setNotes={setNotes}
-        activePageId={activePageId}
-        activeNoteId={activeNoteId}
-      />
-      <ReplaceInNotesModal
-        isOpen={modals.replaceInNotes}
-        onClose={() => closeModal("replaceInNotes")}
-        notes={notes}
-        setNotes={setNotes}
-        activePageId={activePageId}
-        activeNoteId={activeNoteId}
       />
       <SideMenu
         notes={notes}
