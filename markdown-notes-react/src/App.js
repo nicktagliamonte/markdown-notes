@@ -302,6 +302,8 @@ function App() {
         handleSaveAs={handleSaveAs}
         handleSave={handleSave}
         handleOpen={handleOpen}
+        notes={notes}
+        setNotes={setNotes}
       />
       <FindModal isOpen={modals.find} onClose={() => closeModal("find")} />
       <ReplaceModal
@@ -328,6 +330,7 @@ function App() {
         unsavedChanges={unsavedChanges}
         setNextPage={setNextPage}
         setModalOpen={setModalOpen}
+        setNotes={setNotes}
       />
       <TabBar
         sideMenuWidth={sideMenuWidth}

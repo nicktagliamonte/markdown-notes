@@ -1,5 +1,10 @@
 /* eslint-disable no-unused-vars */
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import { Box, IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close"; // Import the Close icon
@@ -16,6 +21,7 @@ const TabBar = forwardRef(
       notes,
       setNotes,
       setActivePageId,
+      setActiveNoteId
     },
     ref
   ) => {
@@ -107,6 +113,48 @@ const TabBar = forwardRef(
         )
       );
     };
+
+    const handleAddNote = () => {
+      const highestNoteId = 
+        notes.length > 0 ? Math.max(...notes.map((note) => note.id), 0) : 0;
+    
+      const newNote = {
+        id: highestNoteId + 1, // Set to one more than the current highest note id
+        title: "New Note", // Default title for the new note
+        pages: [
+          {
+            id: 1, // Starting page ID
+            title: "New Page", // Default title for the new page
+            content: "", // Default empty content for the new page
+            tempContent: "",
+          },
+        ],
+      };
+    
+      // Add the new note to notes and update the active state
+      setNotes((prevNotes) => {
+        const updatedNotes = [...prevNotes, newNote];
+        
+        // Set the editor content after notes have been updated
+        setEditorContent(newNote.pages[0].content || ""); // Use the content of the first page in the new note
+        setActiveNoteId(newNote.id); // Set the newly added note as active
+        setActivePageId(newNote.pages[0].id); // Set the first page as active
+        return updatedNotes;
+      });
+    
+      // Add the first page of the new note as a tab
+      const newTab = {
+        id: 1, // Matches the page ID
+        title: "New Page", // Matches the page title
+        content: "", // Matches the page content
+        tempContent: "", // Matches the page tempContent
+      };
+    
+      setTabs((prevTabs) => [...prevTabs, newTab]); // Add new tab to the list
+      setNextTabNumber((prevNumber) => prevNumber + 1); // Increment nextTabNumber
+      setNextTabId((prevNumber) => prevNumber + 1); // Increment nextTabId
+      setActiveTabId(newTab.id); // Set the newly added tab as active
+    };    
 
     const handleAddTabFromPage = (page) => {
       // Check if the tab with the same id is already open
@@ -266,7 +314,13 @@ const TabBar = forwardRef(
                 backgroundColor: "primary.dark",
               },
             }}
-            onClick={handleAddTab} // Add new tab when clicked
+            onClick={() => {
+              if (activeNoteId !== null) {
+                handleAddTab(); // Call handleAddTab if activeNoteId is not null
+              } else {
+                handleAddNote(); // Call handleAddNote if activeNoteId is null
+              }
+            }}
           >
             <AddIcon sx={{ fontSize: "16px" }} /> {/* Smaller icon size */}
           </IconButton>

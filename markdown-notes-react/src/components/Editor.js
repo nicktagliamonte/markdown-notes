@@ -71,8 +71,8 @@ const Editor = ({
               (page) => page.id === activePageId
             );
 
-            // Check for tempContent: if it's non-empty, use it. If not, fall back to editorContent
             if (currentPage?.tempContent !== "") {
+              console.log(currentPage?.tempContent);
               setEditorContent(currentPage.tempContent);
               return currentPage.tempContent; // Use tempContent if it exists and is not empty
             }

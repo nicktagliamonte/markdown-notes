@@ -6,7 +6,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 
-const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceInNotes, handleSaveAs, handleSave, handleOpen }) => {
+const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceInNotes, handleSaveAs, handleSave, handleOpen, notes, setNotes }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const [fileMenuAnchorEl, setFileMenuAnchorEl] = useState(null);
   const [editMenuAnchorEl, setEditMenuAnchorEl] = useState(null);
@@ -16,6 +16,28 @@ const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceIn
   const handleFileMenuOpen = (event) =>
     setFileMenuAnchorEl(event.currentTarget);
   const handleFileMenuClose = () => setFileMenuAnchorEl(null);
+
+  const handleCreateNote = (notes) => {
+    // Check if notes is defined and is an array
+    const highestNoteId = notes.length > 0 ? Math.max(...notes.map((note) => note.id), 0) : 0;
+  
+    // Create the new note and page
+    const newNote = {
+      id: highestNoteId + 1, // Set to one more than the current highest note id
+      title: "New Note", // Default title for the new note
+      pages: [
+        {
+          id: 1, // Starting page ID
+          title: "New Page", // Default title for the new page
+          content: "", // Default empty content for the new page
+          tempContent: "",
+        },
+      ],
+    };
+  
+    // Return the updated notes array with the new note
+    return [...notes, newNote];
+  };  
 
   // Edit Menu handlers
   const handleEditMenuOpen = (event) =>
@@ -137,7 +159,14 @@ const TopMenu = ({ onOpenFind, onOpenReplace, onOpenFindInNotes, onOpenReplaceIn
           >
             Save As
           </MenuItem>
-          <MenuItem onClick={handleFileMenuClose}>New Note</MenuItem>
+          <MenuItem
+            onClick={() => {
+              setNotes(handleCreateNote(notes));
+              handleFileMenuClose();
+            }}
+          >
+            New Note
+          </MenuItem>
         </Menu>
 
         {/* Edit Button and Menu */}
