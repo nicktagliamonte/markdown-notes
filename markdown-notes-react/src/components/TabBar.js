@@ -45,32 +45,42 @@ const TabBar = forwardRef(
     const handleTabClick = (id) => {
       setActiveTabId(id);
       setActivePageId(id);
-      setEditorContent(pages.find((page) => page.id === id)?.content || "");
+      if (pages && Array.isArray(pages)) {
+        setEditorContent(
+          pages.find((page) => page.id === id)?.content || ""
+        );
+      } else {
+        setEditorContent(""); // Default to empty string if pages are invalid
+      }
     };
 
     const handleCloseTab = (idToRemove) => {
       const remainingTabs = tabs.filter((tab) => tab.id !== idToRemove);
-
+    
       // If the closed tab is the active tab, reset the active tab
       if (idToRemove === activeTabId) {
         // Set new active tab if one exists, otherwise set null
         const newActiveTabId = remainingTabs[0]?.id || null;
         setActiveTabId(newActiveTabId);
-
-        // Set editor content to the content of the new active tab
-        setEditorContent(
-          pages.find((page) => page.id === newActiveTabId)?.content || ""
-        );
+    
+        // Check if pages exist before accessing them
+        if (pages && Array.isArray(pages)) {
+          setEditorContent(
+            pages.find((page) => page.id === newActiveTabId)?.content || ""
+          );
+        } else {
+          setEditorContent(""); // Default to empty string if pages are invalid
+        }
       }
-
+    
       // Set editorContent to null if no tabs remain
       if (remainingTabs.length === 0) {
         setEditorContent(null);
       }
-
+    
       // Update the tabs state with remaining tabs
       setTabs(remainingTabs);
-    };
+    };    
 
     // Function to handle adding a new tab
     const handleAddTab = () => {
@@ -193,7 +203,15 @@ const TabBar = forwardRef(
     useImperativeHandle(ref, () => ({
       handleAddTabFromPage,
       closeAllTabs,
-    }));
+      getTabs: () => tabs,
+      updateTab: (tabId, newTitle) => {
+        setTabs((prevTabs) =>
+          prevTabs.map((tab) =>
+            tab.id === tabId ? { ...tab, title: newTitle } : tab
+          )
+        );
+      },
+    }));    
 
     return (
       <Box

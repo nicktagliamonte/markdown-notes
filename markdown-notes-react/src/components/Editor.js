@@ -13,6 +13,8 @@ const Editor = ({
   setNotes,
   activeNoteId,
   activePageId,
+  handleCursorChange,
+  cursorPosition
 }) => {
   const theme = useTheme();
 
@@ -71,8 +73,7 @@ const Editor = ({
               (page) => page.id === activePageId
             );
 
-            if (currentPage?.tempContent !== "") {
-              console.log(currentPage?.tempContent);
+            if (currentPage?.tempContent !== null && currentPage?.tempContent !== undefined) {
               setEditorContent(currentPage.tempContent);
               return currentPage.tempContent; // Use tempContent if it exists and is not empty
             }
@@ -87,25 +88,83 @@ const Editor = ({
             // Update tempContent for the active page
             setTempContent(updatedValue); // Set tempContent for the current page
           }}
+          onInput={handleCursorChange} // Ensure cursor position updates on input
+          onClick={handleCursorChange}
+          onKeyUp={handleCursorChange}
           onKeyDown={(e) => {
+            const start = e.target.selectionStart;
+            const end = e.target.selectionEnd;
+            const lines = editorContent.slice(0, start).split("\n");
+            const currentLineIndex = lines.length - 1;
+            const currentLine = lines[currentLineIndex];
+          
+            const tabSpaces = "    "; // 4 spaces for a tab
+            const currentLineIndentation = currentLine.match(/^ */)?.[0]?.length || 0;
+            const tabDepth = Math.floor(currentLineIndentation / 4);
+          
             if (e.key === "Tab") {
               e.preventDefault();
-              const start = e.target.selectionStart;
-              const end = e.target.selectionEnd;
-
-              const value =
-                editorContent.substring(0, start) +
-                "    " +
-                editorContent.substring(end);
-              setEditorContent(value);
-              setTempContent(value); // Sync tempContent with editorContent
-
+              if (e.shiftKey) {
+                // Reduce indentation
+                if (currentLine.startsWith(tabSpaces)) {
+                  const updatedLine = currentLine.slice(4); // Remove 4 spaces
+                  const updatedContent =
+                    editorContent.slice(0, start - 4) +
+                    updatedLine +
+                    editorContent.slice(end);
+                  setEditorContent(updatedContent);
+                  setTempContent(updatedContent);
+                  setTimeout(
+                    () => e.target.setSelectionRange(start - 4, start - 4),
+                    0
+                  );
+                }
+              } else {
+                // Increase indentation
+                const updatedContent =
+                  editorContent.slice(0, start) +
+                  tabSpaces +
+                  editorContent.slice(end);
+                setEditorContent(updatedContent);
+                setTempContent(updatedContent);
+                setTimeout(() => e.target.setSelectionRange(start + 4, start + 4), 0);
+              }
+            } else if (e.key === "Backspace") {
+              // Manual removal of spaces
+              if (currentLine.startsWith("    ") && start === end && start >= 4) {
+                e.preventDefault();
+                const updatedLine = currentLine.slice(4); // Remove 4 spaces
+                const updatedContent =
+                  editorContent.slice(0, start - 4) +
+                  updatedLine +
+                  editorContent.slice(end);
+                setEditorContent(updatedContent);
+                setTempContent(updatedContent);
+                setTimeout(
+                  () => e.target.setSelectionRange(start - 4, start - 4),
+                  0
+                );
+              }
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              // Maintain indentation for the new line
+              const newLineIndentation = tabSpaces.repeat(tabDepth);
+              const updatedContent =
+                editorContent.slice(0, start) +
+                `\n${newLineIndentation}` +
+                editorContent.slice(end);
+              setEditorContent(updatedContent);
+              setTempContent(updatedContent);
               setTimeout(
-                () => e.target.setSelectionRange(start + 4, start + 4),
+                () =>
+                  e.target.setSelectionRange(
+                    start + 1 + newLineIndentation.length,
+                    start + 1 + newLineIndentation.length
+                  ),
                 0
               );
             }
-          }}
+          }}          
           style={{
             width: "100%",
             height: "90%",

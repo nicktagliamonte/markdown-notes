@@ -36,3 +36,7 @@
     transform: rotate(360deg);
   }
 }
+
+.MuiMenu-root {
+  pointer-events: auto !important; /* Ensures the menu doesn’t disable other clicks */
+}

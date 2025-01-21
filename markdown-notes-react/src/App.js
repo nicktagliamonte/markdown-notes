@@ -14,12 +14,12 @@ function App() {
       id: 1,
       title: "Note 1",
       pages: [
-        { id: 1, title: "Page 1", content: "test", tempContent: "" },
+        { id: 1, title: "Page 1", content: "test", tempContent: null },
         {
           id: 2,
           title: "Page 2",
           content: "# test content for page two, distinct from page one",
-          tempContent: "",
+          tempContent: null,
         },
       ],
     },
@@ -27,20 +27,17 @@ function App() {
       id: 2,
       title: "Note 2",
       pages: [
-        { id: 3, title: "Page 1", content: "", tempContent: "" },
-        { id: 4, title: "Page 2", content: "", tempContent: "" },
-        { id: 5, title: "Page 3", content: "", tempContent: "" },
+        { id: 3, title: "Page 1", content: "", tempContent: null },
+        { id: 4, title: "Page 2", content: "", tempContent: null },
+        { id: 5, title: "Page 3", content: "", tempContent: null },
       ],
     },
     {
       id: 3,
       title: "Note 3",
-      pages: [{ id: 6, title: "Page 1", content: "", tempContent: "" }],
+      pages: [{ id: 6, title: "Page 1", content: "", tempContent: null }],
     },
   ]);
-
-  // Temporary for developing the tab bar:
-  const note1Pages = notes.find((note) => note.id === 1)?.pages || [];
 
   // Editor Resizing State
   const [isResizing, setIsResizing] = useState(false);
@@ -80,11 +77,11 @@ function App() {
         return {
           ...note,
           pages: note.pages.map((page) => {
-            if (page.tempContent === "") return page; // Skip pages with no tempContent
+            if (page.tempContent === null) return page; // Skip pages with no tempContent
             return {
               ...page,
               content: page.tempContent, // Update content with tempContent
-              tempContent: "", // Reset tempContent
+              tempContent: null, // Reset tempContent
             };
           }),
         };
@@ -108,6 +105,7 @@ function App() {
       saveActiveNote(); // Apply changes before saving
       await saveFile(fileHandle, JSON.stringify(notes, null, 2));
       setCurrentFilePath(fileHandle);
+      setUnsavedChanges(false);
       alert("File saved successfully!");
     } catch (error) {
       console.error("Error saving file:", error);
@@ -121,6 +119,7 @@ function App() {
     try {
       saveActiveNote(); // Apply changes before saving
       await saveFile(currentFilePath, JSON.stringify(notes, null, 2));
+      setUnsavedChanges(false);
       alert("File saved successfully!");
     } catch (error) {
       console.error("Error saving file:", error);
@@ -267,12 +266,45 @@ function App() {
       ? ""
       : notes.find((note) => note.pages.some((p) => p.id === nextPage.id));
 
+  const revertContent = () => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) => {
+        if (note.id === activeNoteId) {
+          return {
+            ...note,
+            pages: note.pages.map((page) => ({
+              ...page,
+              tempContent: null, // Reset tempContent
+            })),
+          };
+        }
+        return note; // Return note unchanged if not active
+      })
+    );
+  };
+
   const handleModalConfirm = () => {
     closeAllTabs();
     setActiveNoteId(parentNote.id);
     handleAddTabFromPage(nextPage);
     setActivePageId(nextPage.id);
+    setUnsavedChanges(false);
+    revertContent();
     setModalOpen(false);
+  };
+
+  // Bottom Bar Handlers
+  const [cursorPosition, setCursorPosition] = useState({ line: 1, column: 1 });
+
+  const handleCursorChange = (e) => {
+    const textarea = e.target;
+    const cursorPos = textarea.selectionStart;
+
+    const lines = textarea.value.slice(0, cursorPos).split("\n");
+    const line = lines.length;
+    const column = lines[lines.length - 1].length + 1;
+
+    setCursorPosition({ line, column });
   };
 
   return (
@@ -297,6 +329,7 @@ function App() {
         setNextPage={setNextPage}
         setModalOpen={setModalOpen}
         setNotes={setNotes}
+        tabBarRef={tabBarRef}
       />
       <TabBar
         sideMenuWidth={sideMenuWidth}
@@ -304,7 +337,6 @@ function App() {
         setNotes={setNotes}
         activeTabId={activeTabId}
         setActiveTabId={setActiveTabId}
-        pages={note1Pages}
         editorContent={editorContent}
         setEditorContent={setEditorContent}
         ref={tabBarRef}
@@ -329,13 +361,15 @@ function App() {
         setNotes={setNotes}
         activeNoteId={activeNoteId}
         activePageId={activePageId}
+        handleCursorChange={handleCursorChange}
+        cursorPosition={cursorPosition}
       />
       <Preview
         editorHeight={height}
         sideMenuWidth={sideMenuWidth}
         editorContent={editorContent}
       />
-      <BottomBar />
+      <BottomBar cursorPosition={cursorPosition} />
     </div>
   );
 }

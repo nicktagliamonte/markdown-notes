@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme } from "@mui/material/styles";
 
-const BottomBar = () => {
+const BottomBar = ({ cursorPosition }) => {
   const theme = useTheme();
 
   return (
@@ -21,7 +21,7 @@ const BottomBar = () => {
         fontSize: "14px", // Adjust size as needed
       }}
     >
-      Line: 1, Column: 1 {/* Placeholder text */}
+      Line: {cursorPosition.line}, Column: {cursorPosition.column}
     </div>
   );
 };

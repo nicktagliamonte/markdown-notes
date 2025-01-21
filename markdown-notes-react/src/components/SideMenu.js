@@ -27,6 +27,7 @@ const SideMenu = ({
   setNextPage,
   setModalOpen,
   unsavedChanges,
+  tabBarRef
 }) => {
   const theme = useTheme();
   const [expandedNote, setExpandedNote] = useState(null);
@@ -45,25 +46,29 @@ const SideMenu = ({
     const parentNote = notes.find((note) =>
       note.pages.some((p) => p.id === page.id)
     );
-
+  
     if (parentNote) {
       if (parentNote.id !== activeNoteId) {
         if (unsavedChanges) {
+          // Block tab addition until user confirms discard
           setNextPage(page);
           setModalOpen(true);
         } else {
+          // Switch to new note and add the tab immediately
           closeAllTabs();
           setActiveNoteId(parentNote.id);
+          handleAddTabFromPage(page);
         }
+      } else {
+        // Same note, just open the page
+        handleAddTabFromPage(page);
       }
-      handleAddTabFromPage(page);
     }
-  };
+  };  
 
   const handlePageClickAndSetActivePage = (page) => {
     handlePageClick(page); // Call your existing logic
     setActivePageId(page.id); // Separate the active page ID update
-    console.log(page.id);
   };
 
   const handleContextMenu = (event, item, type) => {
@@ -88,12 +93,15 @@ const SideMenu = ({
 
   const handleRenameConfirm = () => {
     if (!newName.trim()) return;
-
+  
     setNotes((prevNotes) =>
       prevNotes.map((note) => {
         if (renameTarget.type === "note" && note.id === renameTarget.id) {
           return { ...note, title: newName };
         } else if (renameTarget.type === "page") {
+          // Update the tab name through the ref
+          tabBarRef.current.updateTab(renameTarget.id, newName);
+  
           return {
             ...note,
             pages: note.pages.map((page) =>
@@ -104,11 +112,11 @@ const SideMenu = ({
         return note;
       })
     );
-
+  
     setRenameModal(false);
     setRenameTarget(null);
     setNewName("");
-  };
+  };  
 
   const openDeleteModal = (id, type) => {
     setDeleteTarget({ id, type });
