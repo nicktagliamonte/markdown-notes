@@ -18,7 +18,9 @@ const MarkdownPreview = ({ editorHeight, sideMenuWidth, editorContent, fontFamil
                 backgroundColor: theme.palette.background.default,
                 color: theme.palette.text.primary,
                 padding: "10px",
-                fontFamily: fontFamily
+                fontFamily: fontFamily,
+                whiteSpace: "normal",
+                overflowX: "hidden"
             }}
         >
             <ReactMarkdown>{editorContent}</ReactMarkdown>

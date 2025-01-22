@@ -7,7 +7,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import Popper from "@mui/material/Popper";
 
-const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFontFamily, cursorPosition, activeNoteId, activePageId, getCursorIndex }) => {
+const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFontFamily, activeNoteId, activePageId, getCursorIndex, setWordWrap }) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
 
   // State to track whether the menus are open
@@ -214,6 +214,10 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
     );
   };  
 
+  const toggleWordWrap = () => {
+    setWordWrap((prev) => !prev);
+  };
+
   return (
     <AppBar sx={{ height: 20, boxShadow: "none" }}>
       <Toolbar
@@ -398,7 +402,7 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
             {isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           </MenuItem>
           <MenuItem
-            onClick={() => {}}
+            onClick={toggleWordWrap}
             sx={{
               backgroundColor: (theme) => theme.palette.menu.default,
               "&:hover": {

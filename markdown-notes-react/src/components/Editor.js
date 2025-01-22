@@ -14,7 +14,7 @@ const Editor = ({
   activeNoteId,
   activePageId,
   handleCursorChange,
-  cursorPosition
+  wordWrap,
 }) => {
   const theme = useTheme();
 
@@ -73,7 +73,10 @@ const Editor = ({
               (page) => page.id === activePageId
             );
 
-            if (currentPage?.tempContent !== null && currentPage?.tempContent !== undefined) {
+            if (
+              currentPage?.tempContent !== null &&
+              currentPage?.tempContent !== undefined
+            ) {
               setEditorContent(currentPage.tempContent);
               return currentPage.tempContent; // Use tempContent if it exists and is not empty
             }
@@ -97,11 +100,12 @@ const Editor = ({
             const lines = editorContent.slice(0, start).split("\n");
             const currentLineIndex = lines.length - 1;
             const currentLine = lines[currentLineIndex];
-          
+
             const tabSpaces = "    "; // 4 spaces for a tab
-            const currentLineIndentation = currentLine.match(/^ */)?.[0]?.length || 0;
+            const currentLineIndentation =
+              currentLine.match(/^ */)?.[0]?.length || 0;
             const tabDepth = Math.floor(currentLineIndentation / 4);
-          
+
             if (e.key === "Tab") {
               e.preventDefault();
               if (e.shiftKey) {
@@ -127,11 +131,18 @@ const Editor = ({
                   editorContent.slice(end);
                 setEditorContent(updatedContent);
                 setTempContent(updatedContent);
-                setTimeout(() => e.target.setSelectionRange(start + 4, start + 4), 0);
+                setTimeout(
+                  () => e.target.setSelectionRange(start + 4, start + 4),
+                  0
+                );
               }
             } else if (e.key === "Backspace") {
               // Manual removal of spaces
-              if (currentLine.startsWith("    ") && start === end && start >= 4) {
+              if (
+                currentLine.startsWith("    ") &&
+                start === end &&
+                start >= 4
+              ) {
                 e.preventDefault();
                 const updatedLine = currentLine.slice(4); // Remove 4 spaces
                 const updatedContent =
@@ -164,7 +175,7 @@ const Editor = ({
                 0
               );
             }
-          }}          
+          }}
           style={{
             width: "100%",
             height: "90%",
@@ -177,6 +188,8 @@ const Editor = ({
             fontSize: "16px",
             fontFamily: "monospace",
             boxSizing: "border-box",
+            whiteSpace: wordWrap ? "normal" : "nowrap", // Change word wrap behavior based on the prop
+            overflowX: wordWrap ? "hidden" : "auto",
           }}
           placeholder="Start typing your notes here..."
           disabled={editorContent === null || editorContent === undefined} // Disable editing when no active tab

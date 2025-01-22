@@ -340,6 +340,8 @@ function App() {
     return index;
   };  
 
+  const [wordWrap, setWordWrap] = useState(true);
+
   return (
     <div>
       <TopMenu
@@ -353,6 +355,7 @@ function App() {
         activeNoteId={activeNoteId}
         activePageId={activePageId}
         getCursorIndex={getCursorIndex}
+        setWordWrap={setWordWrap}
       />
       <SideMenu
         notes={notes}
@@ -400,7 +403,7 @@ function App() {
         activeNoteId={activeNoteId}
         activePageId={activePageId}
         handleCursorChange={handleCursorChange}
-        cursorPosition={cursorPosition}
+        wordWrap={wordWrap}
       />
       <Preview
         editorHeight={height}
