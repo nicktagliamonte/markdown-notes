@@ -192,6 +192,8 @@ function App() {
         typeof page.content === "string"
     );
 
+  const [fontFamily, setFontFamily] = useState("sans-serif");
+
   // Editor Height Resizing Logic
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -307,6 +309,37 @@ function App() {
     setCursorPosition({ line, column });
   };
 
+  const getCursorIndex = () => {
+    // Find the active note based on activeNoteId
+    const activeNote = notes.find((note) => note.id === activeNoteId);
+  
+    // If the active note is not found, return 0 (or handle as needed)
+    if (!activeNote) return 0;
+  
+    // Find the active page based on activePageId within the active note
+    const activePage = activeNote.pages.find((page) => page.id === activePageId);
+  
+    // If the active page is not found, return 0 (or handle as needed)
+    if (!activePage) return 0;
+  
+    // Get the current content from either tempContent or content
+    const content = activePage.tempContent !== null ? activePage.tempContent : activePage.content;
+  
+    // Split content into lines
+    const lines = content.split("\n");
+  
+    // Sum the lengths of lines up to the current line
+    let index = 0;
+    for (let i = 0; i < cursorPosition.line - 1; i++) {
+      index += lines[i].length + 1; // Add length of line and the newline character
+    }
+  
+    // Add the column position in the current line
+    index += cursorPosition.column - 1;
+  
+    return index;
+  };  
+
   return (
     <div>
       <TopMenu
@@ -315,6 +348,11 @@ function App() {
         handleOpen={handleOpen}
         notes={notes}
         setNotes={setNotes}
+        setFontFamily={setFontFamily}
+        cursorPosition={cursorPosition}
+        activeNoteId={activeNoteId}
+        activePageId={activePageId}
+        getCursorIndex={getCursorIndex}
       />
       <SideMenu
         notes={notes}
@@ -368,6 +406,7 @@ function App() {
         editorHeight={height}
         sideMenuWidth={sideMenuWidth}
         editorContent={editorContent}
+        fontFamily={fontFamily}
       />
       <BottomBar cursorPosition={cursorPosition} />
     </div>

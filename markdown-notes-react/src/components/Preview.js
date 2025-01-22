@@ -1,8 +1,8 @@
 import React from "react";
-import { useTheme } from '@mui/material/styles';
-import ReactMarkdown from 'react-markdown';
+import { useTheme } from "@mui/material/styles";
+import ReactMarkdown from "react-markdown";
 
-const MarkdownPreview = ({ editorHeight, sideMenuWidth, editorContent }) => {
+const MarkdownPreview = ({ editorHeight, sideMenuWidth, editorContent, fontFamily }) => {
     const theme = useTheme();
 
     return (
@@ -18,6 +18,7 @@ const MarkdownPreview = ({ editorHeight, sideMenuWidth, editorContent }) => {
                 backgroundColor: theme.palette.background.default,
                 color: theme.palette.text.primary,
                 padding: "10px",
+                fontFamily: fontFamily
             }}
         >
             <ReactMarkdown>{editorContent}</ReactMarkdown>
