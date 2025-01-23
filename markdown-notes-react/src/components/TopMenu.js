@@ -7,7 +7,19 @@ import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import Popper from "@mui/material/Popper";
 
-const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFontFamily, activeNoteId, activePageId, getCursorIndex, setWordWrap }) => {
+const TopMenu = ({
+  handleSaveAs,
+  handleSave,
+  handleOpen,
+  notes,
+  setNotes,
+  setFontFamily,
+  activeNoteId,
+  activePageId,
+  getCursorIndex,
+  setWordWrap,
+  handleSelectAll
+}) => {
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
 
   // State to track whether the menus are open
@@ -126,7 +138,7 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
         setIsFileMenuOpen(false);
         setFileMenuAnchorEl(null);
       }
-  
+
       // Handle View menu
       if (
         viewMenuRef.current &&
@@ -136,7 +148,7 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
         setIsViewMenuOpen(false);
         setViewMenuAnchorEl(null);
       }
-  
+
       // Handle Edit menu, special case with Font submenu
       if (
         editMenuRef.current &&
@@ -147,7 +159,7 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
         setIsEditMenuOpen(false);
         setEditMenuAnchorEl(null);
       }
-  
+
       // Handle Font menu independently (only closes if click is outside both Font menu and Edit menu)
       if (
         fontMenuRef.current &&
@@ -158,7 +170,7 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
         setIsFontMenuOpen(false);
         setFontMenuAnchorEl(null);
       }
-    };  
+    };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -168,42 +180,42 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
 
   const addTimeAndDate = () => {
     const timeAndDate = new Date().toLocaleString();
-  
+
     // Get the string index for the current cursor position
     const cursorIndex = getCursorIndex();
-  
+
     setNotes((prevNotes) =>
       prevNotes.map((note) => {
         if (note.id !== activeNoteId) {
           return note;
         }
-  
+
         return {
           ...note,
           pages: note.pages.map((page) => {
             if (page.id !== activePageId) {
               return page;
             }
-  
+
             // If tempContent is not null, add time and date to it
             if (page.tempContent !== null) {
               const updatedTempContent =
                 page.tempContent.slice(0, cursorIndex) +
                 timeAndDate +
                 page.tempContent.slice(cursorIndex);
-  
+
               return {
                 ...page,
                 tempContent: updatedTempContent,
               };
             }
-  
+
             // If tempContent is null, copy content to tempContent and add time and date
             const updatedTempContentFromContent =
               page.content.slice(0, cursorIndex) +
               timeAndDate +
               page.content.slice(cursorIndex);
-  
+
             return {
               ...page,
               tempContent: updatedTempContentFromContent,
@@ -212,7 +224,7 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
         };
       })
     );
-  };  
+  };
 
   const toggleWordWrap = () => {
     setWordWrap((prev) => !prev);
@@ -402,7 +414,10 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
             {isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           </MenuItem>
           <MenuItem
-            onClick={toggleWordWrap}
+            onClick={() => {
+              toggleWordWrap();
+              handleViewMenuClose();
+            }}
             sx={{
               backgroundColor: (theme) => theme.palette.menu.default,
               "&:hover": {
@@ -474,7 +489,7 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
               borderTopLeftRadius: "6px",
             }}
           >
-            Font <span style={{ marginLeft: '28px', fontSize: 10 }}>▶</span>
+            Font <span style={{ marginLeft: "28px", fontSize: 10 }}>▶</span>
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -489,10 +504,13 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
               color: (theme) => theme.palette.text.primary,
             }}
           >
-            Time/Date 
+            Time/Date
           </MenuItem>
           <MenuItem
-            onClick={() => {}}
+            onClick={() => {
+              handleSelectAll();
+              handleEditMenuClose();
+            }}
             sx={{
               backgroundColor: (theme) => theme.palette.menu.default,
               "&:hover": {
@@ -503,7 +521,7 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
               borderBottomRightRadius: "6px",
             }}
           >
-            Select All 
+            Select All
           </MenuItem>
         </Popper>
 
@@ -548,7 +566,7 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
               },
               color: (theme) => theme.palette.text.primary,
               borderTopLeftRadius: "6px",
-              borderTopRightRadius: "6px"
+              borderTopRightRadius: "6px",
             }}
           >
             Monospace
@@ -557,7 +575,8 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
             onClick={() => {
               setFontFamily("serif");
               handleFontMenuClose();
-              handleEditMenuClose();}}
+              handleEditMenuClose();
+            }}
             sx={{
               backgroundColor: (theme) => theme.palette.menu.default,
               "&:hover": {
@@ -572,7 +591,8 @@ const TopMenu = ({ handleSaveAs, handleSave, handleOpen, notes, setNotes, setFon
             onClick={() => {
               setFontFamily("sans-serif");
               handleFontMenuClose();
-              handleEditMenuClose();}}
+              handleEditMenuClose();
+            }}
             sx={{
               backgroundColor: (theme) => theme.palette.menu.default,
               "&:hover": {

@@ -342,6 +342,17 @@ function App() {
 
   const [wordWrap, setWordWrap] = useState(true);
 
+  const handleSelectAll = () => {
+    const textarea = document.getElementById("editorTextArea");
+  
+    if (textarea !== null) {
+      textarea.focus();
+      textarea.select();
+    } else {
+      console.warn("Textarea not found");
+    }
+  };
+
   return (
     <div>
       <TopMenu
@@ -356,6 +367,7 @@ function App() {
         activePageId={activePageId}
         getCursorIndex={getCursorIndex}
         setWordWrap={setWordWrap}
+        handleSelectAll={handleSelectAll}
       />
       <SideMenu
         notes={notes}

@@ -67,6 +67,7 @@ const Editor = ({
       ) : (
         // Editable textarea for active tab
         <textarea
+        id="editorTextArea"
           value={(() => {
             const currentNote = notes.find((note) => note.id === activeNoteId);
             const currentPage = currentNote?.pages.find(
