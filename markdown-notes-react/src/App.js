@@ -12,31 +12,11 @@ function App() {
   const [notes, setNotes] = useState([
     {
       id: 1,
-      title: "Note 1",
+      title: "New Note",
       pages: [
-        { id: 1, title: "Page 1", content: "test", tempContent: null },
-        {
-          id: 2,
-          title: "Page 2",
-          content: "# test content for page two, distinct from page one",
-          tempContent: null,
-        },
+        { id: 1, title: "Page 1", content: "", tempContent: null }
       ],
-    },
-    {
-      id: 2,
-      title: "Note 2",
-      pages: [
-        { id: 3, title: "Page 1", content: "", tempContent: null },
-        { id: 4, title: "Page 2", content: "", tempContent: null },
-        { id: 5, title: "Page 3", content: "", tempContent: null },
-      ],
-    },
-    {
-      id: 3,
-      title: "Note 3",
-      pages: [{ id: 6, title: "Page 1", content: "", tempContent: null }],
-    },
+    }
   ]);
 
   // Editor Resizing State
